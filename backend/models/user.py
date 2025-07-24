@@ -1,6 +1,7 @@
 from uuid import UUID, uuid4
-from datetime import datetime, timezone
+from datetime import datetime
 
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import func
 
@@ -24,6 +25,12 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User id:{self.id} username:"{self.username}" email:{self.email} is_admin:{self.is_admin} token_valid_after:{self.token_valid_after} created_at:{self.created_at} last_login_at:{self.last_login_at} >'
+
+    def set_password_hash(self, raw_password):
+        self.password = generate_password_hash(raw_password)
+
+    def check_password_match(self, raw_password):
+        return check_password_hash(self.password, raw_password)
 
 
 
