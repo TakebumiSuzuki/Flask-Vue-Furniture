@@ -8,6 +8,8 @@ from .extensions import db, jwt, migrate
 from .config import DevelopmentConfig, ProductionConfig
 from .blueprints.admin.views import admin_bp
 from .blueprints.auth.views import auth_bp
+from .jwt_loaders import register_jwt_loaders
+from .errors import register_error_handlers
 
 app = Flask(__name__)
 # from_object は渡されたオブジェクト（クラスでもインスタンスでも）が持つ、名前がすべて大文字の属性を探し出し、
@@ -16,8 +18,10 @@ app.config.from_object(DevelopmentConfig)
 app.logger.setLevel(logging.DEBUG)
 
 db.init_app(app)
-migrate.init_app(app)
+migrate.init_app(app, db)
 jwt.init_app(app)
+register_error_handlers(app, db)
+register_jwt_loaders(jwt, db)
 
 
 # originsの設定により、Flaskサーバーは、ブラウザに対して「http://localhost:5173 からのリクエストは安全だから

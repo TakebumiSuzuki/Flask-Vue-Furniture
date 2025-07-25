@@ -3,7 +3,7 @@ from datetime import datetime
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from backend.extensions import db
 
@@ -33,4 +33,26 @@ class User(db.Model):
         return check_password_hash(self.password, raw_password)
 
 
+    # scalar_one_or_none() を使うべき場面「結果は、存在しないか、
+    # あるいは絶対に1件だけでなければならない」という強い期待がある場合。
+    @classmethod
+    def get_user_by_username(cls, username):
+        stmt = select(cls).where(cls.username == username)
+        return db.session.execute(stmt).scalar_one_or_none()
+
+    @classmethod
+    def get_user_by_email(cls, email):
+        stmt = select(cls).where(cls.email == email)
+        return db.session.execute(stmt).scalar_one_or_none()
+
+    def update_token_valid_after(self):
+        """
+        このユーザーの全てのトークンを無効化するために、
+        DBサーバーの現在時刻でタイムスタンプを更新する。
+        """
+        # Pythonのdatetimeではなく、DBのNOW()関数を使うようSQLAlchemyに指示する
+        self.token_valid_after = func.now()
+
+    def update_last_login_at(self):
+        self.last_login_at = func.now()
 

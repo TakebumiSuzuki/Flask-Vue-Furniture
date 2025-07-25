@@ -8,7 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # WORKDIRの機能: WORKDIR /app と記述すると、/app ディレクトリが存在しない場合は自動的に作成してくれます
-WORKDIR /app
+WORKDIR /backend
 
 COPY requirements.txt .
 

@@ -1,24 +1,69 @@
-from flask import Blueprint, request, jsonify, url_for
-from backend.schemas.user import CreateUser, PublicUser
-from backend.models.user import User
+from flask import Blueprint, jsonify, url_for
+from werkzeug.exceptions import Unauthorized, Conflict, BadRequest
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, set_refresh_cookies, get_jti, unset_refresh_cookies
+from backend.decorators import json_required
 from backend.extensions import db
+from backend.models.user import User
+from backend.schemas.user import CreateUser, PublicUser
+from backend.models.blocked_token import BlockedToken
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/users')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@auth_bp.post('')
-def create_user():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'Request body must contain JSON data.'}), 400
-    data = CreateUser.model_validate(data).model_dump()
-    user = User(**data)
+@auth_bp.post('/registration')
+@json_required
+def create_user(payload):
+    dto = CreateUser.model_validate(payload).model_dump()
+    user = User(**dto)
+    existing_user = User.get_user_by_username(user.username)
+    existing_email = User.get_user_by_email(user.email)
+    if existing_user:
+        raise Conflict('This username is already taken.')
+    if existing_email:
+        raise Conflict('This email already exists.')
+
     user.set_password_hash(user.password)
     db.session.add(user)
     db.session.commit()
     output = PublicUser.model_validate(user).model_dump()
 
-    return jsonify({
-        'message':'Successfully new user created!',
-        'user': output
-    }), 201, {'Location': url_for('auth.get_user', usr_id=output['id'], _external=True)}
+    return jsonify({ 'user': output }), 201, {'Location': url_for('account.get_user', _external=True)}
+
+
+@auth_bp.post('/login')
+@json_required
+def login(payload):
+    if 'email' not in payload or 'password' not in payload:
+        raise BadRequest('Email and password are required')
+    user = User.get_user_by_email(payload['email'])
+    if user and user.check_password_match(payload['password']):
+        access_token = create_access_token(identity=user.id)
+        refresh_token = create_refresh_token(identity=user.id)
+        user.update_last_login_at()
+        db.session.commit()
+        output = PublicUser.model_validate(user).model_dump()
+
+        response_body = jsonify({
+            'user': output,
+            'access_token': access_token,
+        })
+        set_refresh_cookies(response_body, refresh_token)
+        return response_body, 200
+
+    else:
+        raise Unauthorized('Enter the correct email and password.')
+
+
+@auth_bp.post('/logout')
+@jwt_required(refresh=True)
+def logout():
+    refresh_jti = get_jti()
+    blocked_token = BlockedToken(jti=refresh_jti)
+    db.session.add(blocked_token)
+    db.session.commit()
+    response_body = jsonify({})
+    unset_refresh_cookies(response_body)
+    # クライアントサイドでアクセストークンの消去も忘れずに
+    return response_body, 200
+
+
