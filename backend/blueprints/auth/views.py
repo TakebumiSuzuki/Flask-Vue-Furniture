@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, url_for
+from flask import Blueprint, jsonify, url_for, current_app
 from werkzeug.exceptions import Unauthorized, Conflict, BadRequest
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, set_refresh_cookies, get_jti, unset_refresh_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, set_refresh_cookies, unset_refresh_cookies, get_jwt_identity, get_jwt
 from backend.decorators import json_required
 from backend.extensions import db
 from backend.models.user import User
@@ -21,7 +21,6 @@ def create_user(payload):
         raise Conflict('This username is already taken.')
     if existing_email:
         raise Conflict('This email already exists.')
-
     user.set_password_hash(user.password)
     db.session.add(user)
     db.session.commit()
@@ -57,13 +56,29 @@ def login(payload):
 @auth_bp.post('/logout')
 @jwt_required(refresh=True)
 def logout():
-    refresh_jti = get_jti()
+    refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)
     db.session.add(blocked_token)
     db.session.commit()
     response_body = jsonify({})
     unset_refresh_cookies(response_body)
     # クライアントサイドでアクセストークンの消去も忘れずに
+    return response_body, 200
+
+
+@auth_bp.post('/refresh-tokens')
+@jwt_required(refresh=True)
+def refresh_tokens():
+    refresh_jti = get_jwt()['jti']
+    blocked_token = BlockedToken(jti=refresh_jti)
+    db.session.add(blocked_token)
+    db.session.commit()
+
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity)
+    refresh_token = create_refresh_token(identity)
+    response_body = jsonify({ 'access_token': access_token })
+    set_refresh_cookies(response_body, refresh_token)
     return response_body, 200
 
 

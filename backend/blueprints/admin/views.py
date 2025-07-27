@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from sqlalchemy import select
+from uuid import UUID
 
 from backend.models.user import User
 from backend.schemas.user import ReadUser
@@ -23,7 +24,15 @@ def get_userlist():
 @admin_bp.patch('/users/<string:user_id>/change-role')
 @admin_required
 def change_role(user_id):
-    user = db.session.get(User, user_id)
+    try:
+        user_id_uuid = UUID(user_id)
+    except ValueError:
+        # そもそもUUIDとして不正な形式の文字列が来た場合
+        raise NotFound('Invalid user ID format.')
+    user = db.session.get(User, user_id_uuid)
+    if not user:
+        raise NotFound('User with the specified ID was not found.')
+
     user.is_admin = not user.is_admin
     db.session.commit()
     # クライアント側ではUIだけ変えておく。ページリロードはしなくて良いと考えられる
@@ -34,7 +43,15 @@ def change_role(user_id):
 @admin_bp.delete('/users/<string:user_id>/delete-user')
 @admin_required
 def delete_user(user_id):
-    user = db.session.get(User, user_id)
+    try:
+        user_id_uuid = UUID(user_id)
+    except ValueError:
+        # そもそもUUIDとして不正な形式の文字列が来た場合
+        raise NotFound('Invalid user ID format.')
+    user = db.session.get(User, user_id_uuid)
+    if not user:
+        raise NotFound('User with the specified ID was not found.')
+
     if not user:
         raise NotFound('User with the specified ID was not found.')
     db.session.delete(user)

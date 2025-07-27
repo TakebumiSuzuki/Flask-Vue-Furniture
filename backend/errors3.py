@@ -26,7 +26,7 @@ def register_error_handlers(app, db):
         400 Bad Request: リクエストの形式が不正な場合 (例: JSONのパース失敗など)
         """
         app.logger.info(f"BadRequest: {error.description}")
-        response = {"error_code": "BAD_REQUEST", "message": error.description}
+        response = {"error": "Bad Request", "message": error.description}
         return jsonify(response), 400
 
 
@@ -37,7 +37,7 @@ def register_error_handlers(app, db):
         """
         app.logger.info(f"Unauthorized: {error.description}")
         # WWW-Authenticateヘッダはエラーオブジェクトから取得できる場合がある
-        response = {"error_code": "UNAUTHORIZED", "message": error.description}
+        response = {"error": "Unauthorized", "message": error.description}
         return jsonify(response), 401
 
 
@@ -47,7 +47,7 @@ def register_error_handlers(app, db):
         403 Forbidden: 認証はされているが、リソースへのアクセス権限がない場合
         """
         app.logger.warning(f"Forbidden: {error.description}")
-        response = {"error_code": "FORBIDDEN", "message": error.description}
+        response = {"error": "Forbidden", "message": error.description}
         return jsonify(response), 403
 
 
@@ -57,7 +57,7 @@ def register_error_handlers(app, db):
         404 Not Found: リクエストされたURL/リソースが見つからない場合
         """
         app.logger.info(f"NotFound: {error.description}")
-        response = {"error_code": "NOT_FOUND", "message": error.description}
+        response = {"error": "Not Found", "message": error.description}
         return jsonify(response), 404
 
 
@@ -67,7 +67,7 @@ def register_error_handlers(app, db):
         405 Method Not Allowed: 許可されていないHTTPメソッドでアクセスされた場合
         """
         app.logger.info(f"MethodNotAllowed: {error.description}")
-        response = {"error_code": "METHOD_NOT_ALLOWED", "message": error.description}
+        response = {"error": "Method Not Allowed", "message": error.description}
         return jsonify(response), 405
 
 
@@ -78,7 +78,7 @@ def register_error_handlers(app, db):
         (例: `raise Conflict("この名前は既に使用されています")`)
         """
         app.logger.info(f"Conflict: {error.description}")
-        response = {"error_code": "CONFLICT", "message": error.description}
+        response = {"error": "Conflict", "message": error.description}
         return jsonify(response), 409
 
 
@@ -92,7 +92,7 @@ def register_error_handlers(app, db):
         422 Unprocessable Entity: Pydanticによるリクエストデータのバリデーション失敗
         """
         app.logger.info(f"Pydantic ValidationError: {error.errors()}")
-        response = {"error_code": "VALIDATION_ERROR", "details": error.errors()}
+        response = {"error": "Validation Error", "details": error.errors()}
         return jsonify(response), 422
 
 
@@ -108,7 +108,7 @@ def register_error_handlers(app, db):
         db.session.rollback()
         app.logger.warning(f"IntegrityError: {error.orig}")
         response = {
-            "error_code": "RESOURCE_CONFLICT",
+            "error": "Conflict",
             "message": "A resource with the same unique data already exists.",
         }
         return jsonify(response), 409
@@ -128,7 +128,7 @@ def register_error_handlers(app, db):
         app.logger.error(f"SQLAlchemyError: {error}")
         # 本番環境では詳細なエラーメッセージをクライアントに返さない
         response = {
-            "error_code": "DATABASE_ERROR",
+            "error": "Database Error",
             "message": "An unexpected database error occurred.",
         }
         return jsonify(response), 500
@@ -144,7 +144,7 @@ def register_error_handlers(app, db):
         個別に定義されていない他のWerkzeug HTTPエラーを汎用的に処理する
         """
         app.logger.info(f"HTTPException: {error.code} {error.name}")
-        response = {"error_code": error.name.upper().replace(" ", "_"), "message": error.description}
+        response = {"error": error.name, "message": error.description}
         return jsonify(response), error.code
 
 
@@ -161,13 +161,13 @@ def register_error_handlers(app, db):
         # デバッグモードの場合は詳細を返してもよい
         if app.config.get("DEBUG"):
             response = {
-                "error_code": "INTERNAL_SERVER_ERROR",
+                "error": "Internal Server Error",
                 "message": str(error),
                 "trace": tb.splitlines()
             }
         else:
             response = {
-                "error_code": "INTERNAL_SERVER_ERROR",
+                "error": "Internal Server Error",
                 "message": "An unexpected internal error occurred. The administrators have been notified.",
             }
         return jsonify(response), 500

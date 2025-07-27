@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify
 from flask_jwt_extended import current_user, jwt_required, unset_jwt_cookies
 
 from werkzeug.exceptions import Unauthorized, Conflict
@@ -8,6 +8,8 @@ from backend.models.user import User
 from backend.extensions import db
 from backend.schemas.user import PublicUser, ChangeUsernameUser, ChangePasswordUser
 
+# ここでしている'/account'はあくまでデフォルトで、app.register_blueprint(account_bp, url_prefix='/api/v1/account')
+# により、完全に上書きされる。結合はされない。よってこの場合、'/account'は意味をなさない
 account_bp = Blueprint('account', __name__, url_prefix='/account')
 
 # current_userについて:もしユーザーが見つからなければ、Flask-JWT-Extendedが自動的に

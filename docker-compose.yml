@@ -5,7 +5,7 @@ services:
     ports:
       - "5001:5000"
     volumes:
-      - ./backend:/app
+      - ./backend:/backend
     # pg_isready コマンドが成功を返してから backend が起動開始
     depends_on:
       db:
