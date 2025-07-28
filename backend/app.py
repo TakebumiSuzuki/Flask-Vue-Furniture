@@ -13,13 +13,14 @@ from backend.blueprints.account.views import account_bp
 
 
 def create_app(config_override=None) -> Flask:
-    
+
     if config_override: #テスト用
         # pytestでテストを実行する際にはflask runを使わないので、環境変数FLASK_DEBUGは関係ない。
         # app.config['TESTING'] = True と app.config['DEBUG'] = False にすることが重要。
         config = config_override
 
     else: # flask run 用
+        print(f"デバックの数字： {os.getenv("FLASK_DEBUG", "0")}")
         debug_flag = os.getenv("FLASK_DEBUG", "0") in ("1", "true", "True")
         config = DevelopmentConfig if debug_flag else ProductionConfig
 

@@ -1,12 +1,46 @@
 # ===================================================================
-# Python / Flask プロジェクト用 .gitignore
+# 共通: IDE / OS / Logs
 # ===================================================================
 
-# 1. 環境設定
-# -------------------------------------------------------------------
-#
-# 仮想環境のフォルダ。チームメンバーそれぞれがローカルで作成するものなので共有しない。
-# 一般的な仮想環境フォルダ名を網羅。
+# IDE / Editor settings
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS generated files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+
+# ===================================================================
+# バックエンド: Python / Flask
+# ===================================================================
+
+# Virtual environment
 venv/
 env/
 .venv/
@@ -15,58 +49,33 @@ env/
 */env/
 */.venv/
 
-# 環境変数を定義する.envファイル。APIキーやDBのパスワードなどの秘密情報を含む。
-# .env.example や .env.template のようなテンプレートファイルはバージョン管理に含めるのが一般的。
+# Environment variables
+# .env.example should be versioned
 .env
 .env.*
 !.env.example
 !.env.template
 
+# Flask specific
+instance/
 
-# 2. Flask固有のファイル
-# -------------------------------------------------------------------
-#
-# Flaskのインスタンスフォルダ。設定ファイルやSQLiteデータベースなど、
-# デプロイ環境ごとに異なるファイルが配置されるため、バージョン管理から除外する。
-/instance/
-
-# Flask-Cacheが生成するキャッシュファイル
-.webassets-cache/
-*/.webassets-cache/
-
-
-# 3. Pythonのキャッシュとパッケージ関連
-# -------------------------------------------------------------------
-#
-# Pythonが自動生成するバイトコードやキャッシュ
+# Python caches and artifacts
 __pycache__/
 *.py[cod]
 *$py.class
-
-# パッケージインストーラーやディストリビューションの生成物
 build/
-dist/
 *.egg-info/
 *.egg
 pip-log.txt
 pip-delete-this-directory.txt
 .eggs/
 
-
-# 4. データベースファイル
-# -------------------------------------------------------------------
-#
-# ローカル開発用のSQLiteデータベースファイル。
-# 本番環境では使わないうえ、中身は開発者ごとに異なるため共有しない。
+# Database files
 *.db
 *.sqlite
 *.sqlite3
 
-
-# 5. テスト・カバレッジレポート
-# -------------------------------------------------------------------
-#
-# テスト実行時に生成されるキャッシュやレポート
+# Test & coverage reports
 .pytest_cache/
 .tox/
 .coverage
@@ -77,40 +86,16 @@ coverage.xml
 *.cover
 
 
-# 6. IDE / エディタ固有の設定ファイル
-# -------------------------------------------------------------------
-#
-# 開発者個人のエディタ設定をリポジトリに含めないようにする。
-# VSCode
-.vscode/
-# PyCharm
-.idea/
-# Sublime Text
-*.sublime-project
-*.sublime-workspace
-# Vim
-*.swp
-*~
+# ===================================================================
+# フロントエンド: JS / Vue3 / Vite
+# ===================================================================
 
+# Dependencies
+node_modules/
 
-# 7. OS固有のファイル
-# -------------------------------------------------------------------
-#
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.Trashes
+# Build outputs
+dist/
+dist-ssr/
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-
-# 8. ログファイル
-# -------------------------------------------------------------------
-*.log
-logs/
+# Environment variables
+*.local

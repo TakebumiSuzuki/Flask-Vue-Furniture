@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --font-custom: "Noto Sans", sans-serif;
+}
+
+
+input{
+  @apply block px-4 py-2 border rounded-md outline-none shadow-sm focus:shadow-md w-full
+}
+
+.btn{
+  @apply px-8 py-2 rounded-md font-medium block cursor-pointer shadow-sm hover:shadow-md active:shadow-lg text-white text-lg
+}
