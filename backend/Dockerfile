@@ -8,8 +8,12 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # WORKDIRの機能: WORKDIR /app と記述すると、/app ディレクトリが存在しない場合は自動的に作成してくれます
+# コンテナ内での以降のコマンド（RUN, CMD, ENTRYPOINTなど）が実行されるカレントディレクトリを/backendに設定するという意味
 WORKDIR /backend
 
+# python:3.12.11-slim-bullseye のような公式イメージは、Pythonのリリースに合わせて、その時点で安定している比較的新しい
+# バージョンの pip や setuptools を同梱してくれています。そのため、ほとんどのパッケージはこの標準のpipで問題なく
+# インストールできます。つまり、RUN pip install -U pip のように書く必要はほとんどの場合でない。
 COPY requirements.txt .
 
 # pip はダウンロードしたパッケージをキャッシュとして一時的に保存します。--no-cache-dirでこれを無効に。
@@ -21,6 +25,7 @@ COPY . .
 # 実際にネットワークを設定するのではなく、5000番ポートで通信を待ち受ける予定だ、ということを記しているのみ
 EXPOSE 5000
 
+# 以下の行はイメージを作る時には実行されない。コンテナをインスタンス化する時に、ボリュームのマウントが完了してから実行される
 # --host=0.0.0.0 により、コンテナ内部（127.0.0.1）からのアクセスも含め全ての宛先からの通信を受ける
 CMD [ "flask", "run", "--host=0.0.0.0" ]
 

@@ -13,13 +13,12 @@ from backend.blueprints.account.views import account_bp
 
 
 def create_app(config_override=None) -> Flask:
-    """
-    Flask アプリファクトリ。
-    テスト実行時には引数 `config_override` で設定を上書きできる。
-    引数がない場合(flask runなどで実行)は、環境変数から設定を決定する。
-    """
-    if config_override: #主にテスト用
+    
+    if config_override: #テスト用
+        # pytestでテストを実行する際にはflask runを使わないので、環境変数FLASK_DEBUGは関係ない。
+        # app.config['TESTING'] = True と app.config['DEBUG'] = False にすることが重要。
         config = config_override
+
     else: # flask run 用
         debug_flag = os.getenv("FLASK_DEBUG", "0") in ("1", "true", "True")
         config = DevelopmentConfig if debug_flag else ProductionConfig
@@ -72,7 +71,8 @@ def create_app(config_override=None) -> Flask:
 # view関数を実行するが、その前に、コンテキストスタックを準備する。なぜならばdbや他のパッケージは
 # コンテキストスタックの最後にプッシュされた app　への参照を使うから。そしてview関数の実行が終わると
 # このコンテキストスタックからプッシュされたappはpopされて消える
-# Flask-SQLAlchemy, Flask-JWT-Extended, Flask-Migrate, Flask-Loginなど、適切に設計されたほぼ全てのFlask拡張機能は、この規約に従っています。
+# Flask-SQLAlchemy, Flask-JWT-Extended, Flask-Migrate, Flask-Loginなど、
+# 適切に設計されたほぼ全てのFlask拡張機能は、この規約に従っています。
 
 
 

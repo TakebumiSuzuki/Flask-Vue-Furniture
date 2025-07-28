@@ -1,0 +1,22 @@
+# 仮想環境
+.venv
+venv/
+
+# Pythonキャッシュファイル
+__pycache__/
+*.pyc
+
+# IDE/エディタ設定ファイル
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# テスト関連
+.pytest_cache/
+.coverage
+
+# 環境変数ファイル (イメージに含めるべきではない)
+.env

@@ -4,15 +4,19 @@
 
 import sys, os
 # プロジェクトのルートディレクトリ(/backend)の、さらに親('/)を検索パスに追加する
-# これにより、'from backend.app'というインポートが可能になる
+# これにより、'from backend.app'というインポートが可能になる。
+# これは、上記コマンドでpytestをコンテナ内で実行するときに、コマンドラインは backendディレクトリにいるので。
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 import pytest
-from backend.app import create_app
-from backend.extensions import db as _db  # 関数名のdbと名前の衝突が起こらないようにするため
-from backend.config import TestingConfig
 from flask_jwt_extended import create_access_token
+
+from backend.app import create_app
+from backend.config import TestingConfig
+
+from backend.extensions import db as _db  # 関数名のdbと名前の衝突が起こらないようにするため
 from backend.models.user import User
+
 
 @pytest.fixture(scope='session')
 def app():
@@ -20,7 +24,8 @@ def app():
 
     with app.app_context():
         yield app
-    # 上の部分はこの場合、return appでも問題ないが、yield appとすることで、将来、必要ならば後片付けのコードを追加することが可能
+    # 上の部分はこの場合、return appでも問題ないが、yield appとすることで、将来、必要ならば例として、
+    # 以下のような後片付けのコードを追加することが可能
     # cleanup_temporary_files()
 
 
@@ -32,9 +37,9 @@ def client(app):
     return app.test_client()
 
 
-# @pytest.fixture で修飾された db(app) 関数は、Pythonの文法上、ジェネレータ関数と考えて良い。
+# ここで、@pytest.fixture で修飾された db(app) 関数は、Pythonの文法上、ジェネレータ関数と考えて良い。
 @pytest.fixture(scope='function', autouse=True)
-def db(app): # db_fixtureという名前に変えてもOK
+def db(app):
     """
     各テスト関数の実行前にデータベースをクリーンな状態にし、
     実行後に後片付けを行います。
@@ -58,7 +63,6 @@ def authenticated_user(db):
     db.session.add(user)
     db.session.commit()
 
-    # そのユーザーのアクセストークンを生成
     access_token = create_access_token(identity=user.id)
 
     return user, access_token
@@ -76,7 +80,6 @@ def authenticated_admin(db):
     db.session.add(admin_user)
     db.session.commit()
 
-    # その管理者ユーザーのアクセストークンを生成
     access_token = create_access_token(identity=admin_user.id)
 
     return admin_user, access_token

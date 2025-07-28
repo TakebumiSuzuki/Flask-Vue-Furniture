@@ -1,8 +1,68 @@
-from flask import url_for, current_app # current_app をインポート
+from flask import url_for, current_app
 from backend.models.user import User
 from backend.models.blocked_token import BlockedToken
 
-# ... (TestRegistrationクラスはそのまま) ...
+
+class TestRegistration:
+    def test_registration_success(self, client):
+        payload = {
+            "username": "newuser",
+            "email":    "newuser@example.com",
+            # ← ここを Password123! のように特殊文字を含むものにする
+            "password": "Password123!"
+        }
+        response = client.post(
+            url_for('auth.create_user'),
+            json=payload
+        )
+        assert response.status_code == 201
+        data = response.get_json()
+        assert data["user"]["username"] == payload["username"]
+        assert "password" not in data["user"]
+        assert "Location" in response.headers
+        assert response.headers["Location"].endswith(
+            url_for('account.get_user', _external=True)
+        )
+
+
+    def test_registration_conflict_username(self, client, db):
+        u = User(username="existing", email="e1@example.com")
+        u.set_password_hash("Password123!")
+        db.session.add(u)
+        db.session.commit()
+
+        payload = {
+            "username": "existing",
+            "email":    "newemail@example.com",
+            "password": "Password123!"
+        }
+        response = client.post(
+            url_for('auth.create_user'),
+            json=payload
+        )
+        assert response.status_code == 409
+        data = response.get_json()
+        assert "This username is already taken." in data.get("message", "")
+
+
+    def test_registration_conflict_email(self, client, db):
+        u = User(username="unique", email="taken@example.com")
+        u.set_password_hash("Password123!")
+        db.session.add(u)
+        db.session.commit()
+
+        payload = {
+            "username": "anotheruser",
+            "email":    "taken@example.com",
+            "password": "Password123!"
+        }
+        response = client.post(
+            url_for('auth.create_user'),
+            json=payload
+        )
+        assert response.status_code == 409
+        data = response.get_json()
+        assert "This email already exists." in data.get("message", "")
 
 
 # --- POST /auth/login ---
