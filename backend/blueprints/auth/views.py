@@ -54,7 +54,7 @@ def login(payload):
 
 
 @auth_bp.post('/logout')
-@jwt_required(refresh=True)
+@jwt_required(refresh=True, locations=["cookies"])
 def logout():
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)
@@ -67,7 +67,9 @@ def logout():
 
 
 @auth_bp.post('/refresh-tokens')
-@jwt_required(refresh=True)
+# このlocations=["cookies"]のおかげでJWT_TOKEN_LOCATION = ['headers', 'cookies']が上書きされ、
+# これにより、クライアントサイドのaxiosのインターセプターが簡潔に書けるようになる。
+@jwt_required(refresh=True, locations=["cookies"])
 def refresh_tokens():
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)

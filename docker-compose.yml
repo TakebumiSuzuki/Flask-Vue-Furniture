@@ -1,5 +1,20 @@
 name: furniture_app
 services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend
+      # マウントの例外ルール(ホスト側のパスを指定せず、コンテナ内の絶対パスだけを記述する)
+      # flask側では、.venvを使わずシステムにパッケージをインストールしているので、この問題は起こらない。
+      # （初回起動なら）まず、イメージの中にある /frontend/node_modules の中身を、
+      # frontend_node_modules ボリュームにコピーする。
+      #そして、そのボリュームをコンテナの /frontend/node_modules にマウントする
+      - frontend_node_modules:/frontend/node_modules
+    depends_on:
+      - backend
+
   backend:
     build: ./backend
     ports:
@@ -41,3 +56,5 @@ services:
 # 特定のパスではなく、Dockerエンジンが管理するpostgres_dataと名付けられた専用の領域にデータの実体が保存される
 volumes:
   postgres_data:
+  # これはnpmによる仮想環境のモジュールファイルをバリュームで隠されないようにするため
+  frontend_node_modules:

@@ -92,7 +92,18 @@ def register_error_handlers(app, db):
         422 Unprocessable Entity: Pydanticによるリクエストデータのバリデーション失敗
         """
         app.logger.info(f"Pydantic ValidationError: {error.errors()}")
-        response = {"error_code": "VALIDATION_ERROR", "details": error.errors()}
+        errors_dic = {}
+        for e in error.errors():
+            if e['loc'][0]:
+                field_name = e['loc'][0]
+            else:
+                # モデル全体のバリデーション（Root Validators）でエラーが発生した場合はlocが空のタプル()になる　
+                field_name = 'root'
+            if field_name not in errors_dic:
+                errors_dic[field_name] = []
+            errors_dic[field_name].append(e['msg'])
+
+        response = {"error_code": "VALIDATION_ERROR", "message": errors_dic}
         return jsonify(response), 422
 
 
