@@ -94,7 +94,7 @@ def register_error_handlers(app, db):
         app.logger.info(f"Pydantic ValidationError: {error.errors()}")
         errors_dic = {}
         for e in error.errors():
-            if e['loc'][0]:
+            if e['loc']:
                 field_name = e['loc'][0]
             else:
                 # モデル全体のバリデーション（Root Validators）でエラーが発生した場合はlocが空のタプル()になる　
@@ -120,7 +120,7 @@ def register_error_handlers(app, db):
         app.logger.warning(f"IntegrityError: {error.orig}")
         response = {
             "error_code": "RESOURCE_CONFLICT",
-            "message": "A resource with the same unique data already exists.",
+            "message": "There was an issue with the data you entered that violated a database rule. Please review your input.",
         }
         return jsonify(response), 409
 
@@ -153,6 +153,7 @@ def register_error_handlers(app, db):
     def handle_http_exception(error):
         """
         個別に定義されていない他のWerkzeug HTTPエラーを汎用的に処理する
+        HTTPException は、Werkzeug ライブラリ内で定義されている、すべての HTTP エラー例外の基底クラス
         """
         app.logger.info(f"HTTPException: {error.code} {error.name}")
         response = {"error_code": error.name.upper().replace(" ", "_"), "message": error.description}

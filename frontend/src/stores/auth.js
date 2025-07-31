@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed, TrackOpTypes } from 'vue'
+import { ref, computed } from 'vue'
 import apiClient from '@/api';
 
 
@@ -62,33 +62,55 @@ export const useAuthStore = defineStore('auth', ()=>{
       user.value = data.user
 
     }catch(err){
-      const message = err?.response?.data?.message ?? 'Failed to log in.'
-      throw new Error(message) // ← これで呼び出し側に拒否（reject）として伝わる
+      const message = err?.response?.data?.message ?? 'Failed to log in. Please try again later'
+      throw new Error(message)
     }
   }
 
   async function logout(){
     try{
-      await apiClient.post('/api/vi/auth/logout', {}, { withCredentials: true })
+      await apiClient.post('/api/v1/auth/logout', {}, { withCredentials: true })
       accessToken.value = null
       user.value = null
     }catch(err){
-      throw Error('Faild to logout. Please try again later')
+      const message = err?.response?.data?.message ?? 'Failed to log out. Please try again later'
+      throw new Error(message)
     }
   }
 
 
   async function updateUsername(formData){
-
-
+    try{
+      await apiClient.patch('/api/v1/update-username', formData)
+      user.username = formData.username
+    }catch(err){
+      const message = err?.response?.data?.message ?? 'Failed to update username. Please try again later'
+      throw new Error(message)
+    }
   }
 
   async function updatePassword(formData){
-
+    try{
+      await apiClient.patch('/api/v1/update-password', formData)
+      accessToken.value = null
+      user.value = null
+    }catch(err){
+      const message = err?.response?.data?.message ?? 'Failed to change password. Please try again later'
+      throw new Error(message)
+    }
   }
 
 
   async function deleteUser(){
+    try{
+      await apiClient.delete('/api/v1/auth/delete')
+      accessToken.value = null
+      user.value = null
+    }catch(err){
+      const message = err?.response?.data?.message ?? 'Failed to delete this account. Please try again later'
+      throw new Error(message)
+    }
+
 
   }
 

@@ -69,6 +69,7 @@ def logout():
 @auth_bp.post('/refresh-tokens')
 # このlocations=["cookies"]のおかげでJWT_TOKEN_LOCATION = ['headers', 'cookies']が上書きされ、
 # これにより、クライアントサイドのaxiosのインターセプターが簡潔に書けるようになる。
+# ちなみに、@jwt_required() (または jwt_required(refresh=False) と同等) は、アクセストークンのみを有効とみなす。
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh_tokens():
     refresh_jti = get_jwt()['jti']
