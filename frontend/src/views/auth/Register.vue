@@ -50,11 +50,12 @@
 
   function validateForm(formData){
     // フォーム送信時にエラーを一旦リセットする（任意ですが推奨）
-    // Object.keys(errors).forEach(key => { errors[key] = '' });
+    Object.keys(errors).forEach(key => { errors[key] = '' });
 
     const result = createUserSchema.safeParse(formData)
 
     if (result.success) {
+
       return result.data
 
     }else{

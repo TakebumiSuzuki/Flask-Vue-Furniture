@@ -44,7 +44,7 @@ export const createUserSchema = z.object({
 
 
 export const changeUsernameSchema = z.object({
-  username: z
+  newUsername: z
     .string({
       required_error: 'New username is required.',
     })
@@ -53,19 +53,20 @@ export const changeUsernameSchema = z.object({
 });
 
 
-export const changePasswordSchema = z
-  .object({
-    old_password: z
-      .string({
-        required_error: 'Current password is required.',
-      })
-      .min(1, { message: 'Please enter your current password.' }), // Ensures it's not empty
-    new_password: passwordValidation,
-    new_password_confirmation: z.string({
-      required_error: 'Password confirmation is required.',
-    }),
+export const changePasswordSchema = z.object({
+  old_password: z
+    .string()
+    .nonempty('Password is required.'),
+  new_password: passwordValidation,
+  password_confirmation: z
+    .string()
+    .nonempty('Password confirmation is required.'),
   })
-  .refine((data) => data.new_password === data.new_password_confirmation, { // Add refinement for matching new passwords
-    message: "New passwords do not match.",
-    path: ["new_password_confirmation"], // Set the error path to the confirmation field
+  .refine((data) => data.new_password === data.password_confirmation, {
+      message: "Passwords do not match.",
+      path: ["password_confirmation"],
+  })
+  .refine((data) => data.old_password !== data.new_password, {
+    message: "New password must be different from the old password.",
+    path: ["new_password"],
   });
