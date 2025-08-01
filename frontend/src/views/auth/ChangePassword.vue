@@ -69,19 +69,40 @@
     }
   }
 
-  const onSubmit = async ()=>{
+  const validateOnSubmit = (formData)=>{
     Object.keys(errors).forEach(key => { errors[key] = '' });
     const result = validateForm(formData)
+
     if (result.errors){
       for (const key in result.errors){
         errors[key] = result.errors[key]
       }
-      return
+      return null
+    }else{
+      return result.cleanData
     }
+  }
+
+  const handleServerErrors = (err) =>{
+    if (err.error_code !== 'VALIDATION_ERROR'){
+      errors.root = err['message'] || 'An unexpected error occurred.'
+    }else{
+      for (const field in err['errors_dic']){
+
+        errors[field] = err['errors_dic'][field]
+      }
+    }
+  }
+
+  const onSubmit = async ()=>{
+
+    const cleanData = validateOnSubmit(formData)
+    if (!cleanData){ return }
+
     try{
-      const response = await apiClient.patch({
-        old_password: result.cleanData.old_password,
-        new_password: result.cleanData.new_password
+      const response = await authStore.updatePassword({
+        old_password: cleanData.old_password,
+        new_password: cleanData.new_password
       })
       authStore.accessToken = null
       authStore.user = null
@@ -90,9 +111,8 @@
 
     }catch(err){
       console.log('serverside error')
+      handleServerErrors(err)
     }
-
-
   }
 
 </script>
@@ -105,7 +125,7 @@
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
 
-        <p class="validation-error-text text-center"
+        <p class="validation-error-text !text-center"
             v-text="errors.root ? errors.root : ''"
         ></p>
 

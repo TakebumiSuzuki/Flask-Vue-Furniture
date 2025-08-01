@@ -91,10 +91,11 @@ export const useAuthStore = defineStore('auth', ()=>{
 
   async function updatePassword(formData){
     try{
-      await apiClient.patch('/api/v1/update-password', formData)
+      await apiClient.patch('/api/v1/account/update-password', formData)
       accessToken.value = null
       user.value = null
     }catch(err){
+      console.log(err)
       const message = err?.response?.data?.message ?? 'Failed to change password. Please try again later'
       throw new Error(message)
     }
