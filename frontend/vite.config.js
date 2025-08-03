@@ -22,12 +22,14 @@ export default defineConfig({
     },
   },
 
-  proxy: {
-      // '/api' で始まるパスへのリクエストをFlaskサーバーに転送する
-    '/api': {
-      target: 'http://127.0.0.1:5000', // Flaskサーバーのアドレス
-      changeOrigin: true, // オリジンを変更してCORSエラーを回避
-    }
+  server: { // ★ proxy設定は server オプションの中に入れます
+    proxy: {
+      '/api': {
+        // targetをDockerのサービス名に変更
+        target: 'http://backend:5000',
+        changeOrigin: true,
+      }
+    },
   },
 
   //// ビルドの設定

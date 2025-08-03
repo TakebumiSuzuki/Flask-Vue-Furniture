@@ -14,11 +14,11 @@ class BaseConfig():
     # 複数の場所を指定することもでき、その場合はリストの順序で優先的に検索されます。
     JWT_TOKEN_LOCATION = ['headers', 'cookies']
 
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=3)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=59)
 
     # Trueに設定すると、クッキーを利用した際のクロスサイトリクエストフォージェリ（CSRF）保護が有効になります。
-    JWT_COOKIE_CSRF_PROTECT = True
+    JWT_COOKIE_CSRF_PROTECT = False
 
     # リフレッシュトークンのクッキーが有効なパスを指定しエンドポイントを限定できます。
     # が、リストを設定できない、つまり一つのパスしか指定できないので、ここでは設定しない

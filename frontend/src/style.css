@@ -10,7 +10,7 @@ input{
 }
 
 .btn{
-  @apply px-8 py-2 rounded-md font-medium block cursor-pointer shadow-sm hover:shadow-md active:shadow-lg text-white text-lg hover:scale-101 transition ease-in-out
+  @apply px-8 py-2 rounded-md font-medium block cursor-pointer shadow-sm hover:shadow-md active:shadow-lg text-white text-lg text-center hover:scale-101 transition ease-in-out
 }
 
 .validation-error-text{

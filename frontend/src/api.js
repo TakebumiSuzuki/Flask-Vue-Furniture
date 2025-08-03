@@ -1,12 +1,17 @@
 import axios from 'axios'
-import { useLoaderStore } from '@/stores/loader'
 import { useAuthStore } from '@/stores/auth'
+import { useLoaderStore } from '@/stores/loader'
 
 const apiClient = axios.create({
+    // baseURL: 'http://localhost:5000',
     // axiosのデフォルトのタイムアウト値は 0 です。これはタイムアウトしないことを意味します。
     // 一般的なAPI通信での設定: 5秒～15秒
     timeout: 10000
 })
+
+const refreshTokenApiClient = axios.create({
+    withCredentials: true
+});
 
 
 apiClient.interceptors.request.use(
@@ -16,6 +21,7 @@ apiClient.interceptors.request.use(
         const loaderStore = useLoaderStore()
         loaderStore.increaseCount()
 
+        // // app.use(pinia)が実行される前に、このモジュールがインポートされ、コードが評価される可能性があるので。
         const authStore = useAuthStore()
         if (authStore.accessToken){
             config.headers.Authorization = `Bearer ${authStore.accessToken}`
@@ -30,9 +36,6 @@ apiClient.interceptors.request.use(
         return Promise.reject(error)
     }
 )
-// # (1) refresh=True: リフレッシュトークンのみを許可
-// # (2) locations=["cookies"]: トークンはCookieからのみ探す
-// @jwt_required(refresh=True, locations=["cookies"])
 
 apiClient.interceptors.response.use(
     (response) => {
@@ -47,24 +50,43 @@ apiClient.interceptors.response.use(
         loaderStore.decreaseCount()
 
         const originalRequest = error.config;
-
+        console.log('200番台以外のAPIレスポンスが返ってきています。')
         if (error.response?.data?.error_code === "TOKEN_EXPIRED" && !originalRequest._refreshAttempt){
-
+            console.log('TOKEN_EXPIREDのコードなのでリフレッシュを始めます')
+            // originalRequest は単なるJavaScriptのオブジェクトなので、originalRequest['_refreshAttempt'] = true と書いても全く同じ
             originalRequest._refreshAttempt = true
             try{
-                const response = await apiClient.post('/api/v1/auth/refresh-tokens', {}, { withCredentials: true })
-                if (response?.data.accessToken){
-                    const authStore = useAuthStore()
-                    authStore.accessToken = response.data.accessToken
+                const response = await refreshTokenApiClient.post('/api/v1/auth/refresh-tokens', {}, {
+                    withCredentials: true
+                })
+                console.log('リフレッシュが終わりすでにAccess, refreshトークン両方を取得できました')
+                if (response?.data.access_token){
 
-                    const retryResponse = await apiClient(originalRequest)
-                    return retryResponse
+
+                    const authStore = useAuthStore()
+                    authStore.accessToken = response.data.access_token
+
+                    console.log('再度エラー前のAPIリクエスを送ります')
+                    // 元のリクエストのヘッダーを更新
+                    originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                    // _refreshAttemptのフラグはこの部分で役に立つ。ここでループが発生しないように。
+                    try {
+                        const retryResponse = await apiClient(originalRequest);
+                        return retryResponse;
+                    } catch (retryError) {
+                        console.error('トークンリフレッシュ後の再試行に失敗しました。', retryError);
+                        // 再試行の失敗もエラーとして扱う
+                        return Promise.reject(retryError);
+                    }
+
                 }
             }catch(refreshError){
                 //ログアウト処理
+                console.error('トークンのリフレッシュ処理自体に失敗しました。', refreshError);
                 return Promise.reject(refreshError)
             }
         }
+        console.log('TOKEN_EXPIREDのエラーではないので、そのままエラーを排出します')
         return Promise.reject(error)
     }
 )

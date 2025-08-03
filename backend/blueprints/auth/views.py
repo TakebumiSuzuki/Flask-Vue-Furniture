@@ -7,12 +7,16 @@ from backend.models.user import User
 from backend.schemas.user import CreateUser, PublicUser
 from backend.models.blocked_token import BlockedToken
 
+import time
+
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @auth_bp.post('/registration')
 @json_required
 def create_user(payload):
+    time.sleep(1)
+
     dto = CreateUser.model_validate(payload).model_dump()
     user = User(**dto)
     existing_user = User.get_user_by_username(user.username)
@@ -22,6 +26,7 @@ def create_user(payload):
     if existing_email:
         raise Conflict('This email already exists.')
     user.set_password_hash(user.password)
+    user.is_admin = True #アドミン設定　
     db.session.add(user)
     db.session.commit()
     output = PublicUser.model_validate(user).model_dump()
@@ -32,6 +37,8 @@ def create_user(payload):
 @auth_bp.post('/login')
 @json_required
 def login(payload):
+    time.sleep(1)
+
     if 'email' not in payload or 'password' not in payload:
         raise BadRequest('Email and password are required')
     user = User.get_user_by_email(payload['email'])
@@ -56,6 +63,8 @@ def login(payload):
 @auth_bp.post('/logout')
 @jwt_required(refresh=True, locations=["cookies"])
 def logout():
+    time.sleep(1)
+
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)
     db.session.add(blocked_token)
@@ -72,6 +81,8 @@ def logout():
 # ちなみに、@jwt_required() (または jwt_required(refresh=False) と同等) は、アクセストークンのみを有効とみなす。
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh_tokens():
+    time.sleep(1)
+
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)
     db.session.add(blocked_token)
@@ -83,5 +94,4 @@ def refresh_tokens():
     response_body = jsonify({ 'access_token': access_token })
     set_refresh_cookies(response_body, refresh_token)
     return response_body, 200
-
 

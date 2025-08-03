@@ -4,9 +4,10 @@
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen h-[1px] ">
 
-    <Main/>
+    <Main class="bg-gradient-to-br from-neutral-700 to-zinc-800 text-neutral-50"/>
+
 
   </div>
 

@@ -8,6 +8,8 @@ from backend.models.user import User
 from backend.extensions import db
 from backend.schemas.user import PublicUser, ChangeUsernameUser, ChangePasswordUser
 
+import time
+
 # ここでしている'/account'はあくまでデフォルトで、app.register_blueprint(account_bp, url_prefix='/api/v1/account')
 # により、完全に上書きされる。結合はされない。よってこの場合、'/account'は意味をなさない
 account_bp = Blueprint('account', __name__, url_prefix='/account')
@@ -19,6 +21,8 @@ account_bp = Blueprint('account', __name__, url_prefix='/account')
 @account_bp.get('')
 @jwt_required()
 def get_user():
+    time.sleep(1)
+
     output = PublicUser.model_validate(current_user).model_dump()
     return jsonify({'user': output}), 200
 
@@ -26,6 +30,8 @@ def get_user():
 @account_bp.delete('')
 @jwt_required()
 def delete_user():
+    time.sleep(1)
+
     # Blocklistにrefresh_tokenを登録する必要はない。つまりそもそもrefresh_tokenをいじる必要はない。
     # なぜなら User Lookup loaderによって、Userを見つけられずにエラーになりそこで弾かれるので。
 
@@ -42,6 +48,8 @@ def delete_user():
 @jwt_required()
 @json_required
 def username_change(payload):
+    time.sleep(1)
+
     dto = ChangeUsernameUser.model_validate(payload)
 
     if User.get_user_by_username(payload['username']):
@@ -56,6 +64,8 @@ def username_change(payload):
 @jwt_required()
 @json_required
 def password_update(payload):
+    time.sleep(1)
+
     dto = ChangePasswordUser.model_validate(payload)
 
     if not current_user.check_password_match(dto.old_password):

@@ -1,8 +1,8 @@
 <template>
 
-  <main class="grow px-2 md:px-6">
+  <main class="grow px-2 md:px-6 ">
 
-    <RouterView/>
+    <RouterView />
 
   </main>
 

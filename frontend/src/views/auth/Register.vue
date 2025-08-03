@@ -1,29 +1,28 @@
 <script setup>
-  import { reactive, ref, computed } from 'vue'
+  import { reactive, computed } from 'vue'
   import { useAuthStore } from '@/stores/auth'
   import { createUserSchema } from '@/schemas/user-validation.js'
   import { useLoaderStore } from '@/stores/loader'
   import { useRouter } from 'vue-router'
+  import { useNotificationStore } from '@/stores/notification';
 
-  import CheckIcon from '@/assets/icons/Check.svg'
-  import LoaderIcon from '@/assets/icons/Loader.svg'
+  import Check from '@/assets/icons/Check.svg'
+  import Loader from '@/assets/icons/Loader.svg'
+
+  import { useFormValidation } from '@/composables/userFormValidation'
+
+  import authWrapper from '@/wrappers/authWrapper.vue';
+
+  const isButtonDisabled = computed(()=>{
+    return (!isFormValid.value || loaderStore.loading )
+  })
+
 
   const loaderStore = useLoaderStore()
   const router = useRouter()
   const { createUser } = useAuthStore()
+  const notificationStore = useNotificationStore();
 
-  const usernameError = computed(() =>
-    errors.username && activated.username ? errors.username : ''
-  );
-  const emailError = computed(() =>
-    errors.email && activated.email ? errors.email : ''
-  );
-  const passwordError = computed(() =>
-    errors.password && activated.password ? errors.password : ''
-  );
-  const password_confirmationError = computed(() =>
-    errors.password_confirmation && activated.password_confirmation ? errors.password_confirmation : ''
-  );
 
   const formData = reactive({
     username: '',
@@ -32,192 +31,126 @@
     password_confirmation: '',
   })
 
-  const errors = reactive({
-    root: '',
-    username: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-  })
+  const { isFormValid,
+      errors,
+      onInput,
+      onBlur,
+      validateOnSubmit,
+      handleServerErrors} = useFormValidation(formData, createUserSchema)
 
-  const activated = reactive({
-    root: false,
-    username: false,
-    email: false,
-    password: false,
-    password_confirmation: false,
-  })
-
-  function validateForm(formData){
-    // フォーム送信時にエラーを一旦リセットする（任意ですが推奨）
-    Object.keys(errors).forEach(key => { errors[key] = '' });
-
-    const result = createUserSchema.safeParse(formData)
-
-    if (result.success) {
-
-      return result.data
-
-    }else{
-      // flatten() を使ってエラーを整形されたオブジェクトとして取得
-      const { formErrors, fieldErrors } = result.error.flatten();
-      if (formErrors.length > 0) {
-        errors.root = formErrors[0];
-      }
-      for (const key in fieldErrors) {
-        const messages = fieldErrors[key];
-        if (messages) {
-          errors[key] = messages[0];
-        }
-      }
-      return null
-    }
-  }
-
-  function onInput(field, e) {
-    formData[field] = e.target.value
-    validateForm(formData)
-  }
-
-  function onBlur(field, e) {
-    if (errors[field]){
-      activated[field] = true
-    }
-  }
 
   async function onSubmit() {
-    const cleanedData = validateForm(formData)
-    if (!cleanedData){
-      for (const key in errors){
-        if (key){
-          activated[key] = true
-        }
-      }
-      return
-    }
+    const cleanData = validateOnSubmit(formData)
+      if (!cleanData){ return }
 
-    const { password_confirmation, ...payload } = cleanedData
+    const { password_confirmation, ...payload } = cleanData
     try {
       await createUser(payload)
       router.push({name: 'login'})
-      // 成功のNotification→ログインしてください、と。
+      notificationStore.showNotification('Registration done! Please log in!', 'success');
 
     } catch (err) {
-      // console.error(err)
-      // if (err.response?.data){
-      //   if (err.response.data.error_code === 'VALIDATION_ERROR') {
-      //     for (const key in err.response.data.details) {
-      //       if (Object.hasOwn(errors, key)) { // errorsオブジェクトに存在するキーか確認
-      //         errors[key] = err.response.data.details[key];
-      //       }
-      //     }
-      //   }else if (err.response.data.error_code === 'Conflict'){
-      //     // `errors.append` ではなく、`errors.root` に代入する
-      //     errors.root = err.response.data.message;
-      //   }
-      // }
+      console.log('serverside error')
+        handleServerErrors(err)
     }
   }
+
 </script>
 
 <template>
-  <div class="relative pt-[10%] max-w-[600px] w-full h-full mx-auto ">
+  <div>
+    <authWrapper>
 
-    <div class="rounded-xl shadow-xl backdrop-blur-sm bg-white/60">
-
-      <h1 class="text-4xl text-center py-8">Create Account</h1>
+      <h1 class="text-4xl text-center pt-10 pb-4">Create Account</h1>
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
-        <div v-if="errors.root && activated.root"></div>
 
-        <!-- ユーザー名入力 -->
+        <p class="validation-error-text !text-center"
+            v-text="errors.root ? errors.root : ''"
+        ></p>
+
         <div class="mb-4">
-
           <label for="username" class="sr-only">Username</label>
-          <p class="validation-error-text">
-            {{ usernameError }}
-          </p>
-
+          <p class="validation-error-text"
+            v-text="errors.username ? errors.username : ''"
+          ></p>
           <input
-            id="username"
             type="text"
+            id="username"
             placeholder="Username"
+            :class="{ 'border-red-400': errors.username }"
             :value="formData.username"
-            @input="onInput('username', $event)"
-            @blur="onBlur('username', $event)"
-            class="w-full"
-            :class="{ 'border-red-400': usernameError }"
+            @input="onInput($event)"
+            @blur="onBlur($event)"
           />
         </div>
 
         <div class="mb-4">
           <label for="email" class="sr-only">Email</label>
-          <p class="validation-error-text">
-            {{ emailError }}
-          </p>
+          <p class="validation-error-text"
+            v-text="errors.email ? errors.email : ''"
+          ></p>
           <input
-            id="email"
             type="email"
+            id="email"
             placeholder="Email"
+            :class="{ 'border-red-400': errors.email }"
             :value="formData.email"
-            @input="onInput('email', $event)"
-            @blur="onBlur('email', $event)"
-            class="w-full"
-            :class="{ 'border-red-400': emailError }"
+            @input="onInput($event)"
+            @blur="onBlur($event)"
           />
         </div>
 
         <div class="mb-4">
           <label for="password" class="sr-only">Password</label>
-          <p class="validation-error-text">
-            {{ passwordError }}
-          </p>
+          <p class="validation-error-text"
+            v-text="errors.password ? errors.password : ''"
+          ></p>
           <input
-            id="password"
             type="password"
+            id="password"
             placeholder="Password"
+            :class="{'border-red-400': errors.password}"
             :value="formData.password"
-            @input="onInput('password', $event)"
-            @blur="onBlur('password', $event)"
-            class="w-full"
-            :class="{ 'border-red-400': passwordError }"
+            @input="onInput($event)"
+            @blur="onBlur($event)"
           />
         </div>
 
         <div class="mb-4">
-          <label for="password-confirmation" class="sr-only">Password Confirmation</label>
-          <p class="validation-error-text">
-            {{ password_confirmationError }}
-          </p>
+          <label for="password_confirmation" class="sr-only">Password Confirmation</label>
+          <p class="validation-error-text"
+            v-text="errors.password_confirmation ? errors.password_confirmation : ''"
+          ></p>
           <input
-            id="password-confirmation"
             type="password"
-            placeholder="Password Confirmation"
+            id="password_confirmation"
+            placeholder="Enter password again"
+            :class="{'border-red-400': errors.password_confirmation }"
             :value="formData.password_confirmation"
-            @input="onInput('password_confirmation', $event)"
-            @blur="onBlur('password_confirmation', $event)"
-            class="w-full"
-            :class="{ 'border-red-400': password_confirmationError }"
+            @input="onInput($event)"
+            @blur="onBlur($event)"
           />
         </div>
 
         <button
           type="submit"
-          :disabled="loaderStore.loading"
-          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12"
+          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12
+            disabled:!cursor-not-allowed disabled:!from-neutral-400 disabled:!to-neutral-500 disabled:!scale-100
+          "
+          :disabled="isButtonDisabled"
         >
-          <div v-if="loaderStore.loading" class="flex items-center justify-center gap-1" >
-            <LoaderIcon class="animate-spin"/>
+          <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">
+            <Loader class="animate-spin"/>
             Processing
           </div>
-          <div v-else class="flex items-center justify-center gap-1 ">
-            <CheckIcon/>
+          <div v-else class="flex items-center gap-2 justify-center">
+            <Check/>
             Register Now
           </div>
         </button>
       </form>
 
-    </div>
+    </authWrapper>
   </div>
-
 </template>

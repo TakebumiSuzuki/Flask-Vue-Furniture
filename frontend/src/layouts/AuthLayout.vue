@@ -10,6 +10,7 @@
     <div class="absolute inset-0">
 			<img :src="MainVisual" alt="" class="object-cover w-full h-full object-top">
 		</div>
+    
     <Main/>
 
     <Footer class="z-100"/>

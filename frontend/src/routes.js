@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // // layouts
 // import PublicLayout from '@/layouts/PublicLayout.vue'
-// import AdminLayout  from '@/layouts/AdminLayout.vue'
+import AdminLayout  from '@/layouts/AdminLayout.vue'
 import AuthLayout   from '@/layouts/AuthLayout.vue'
 
 // // public pages
@@ -11,7 +11,9 @@ import AuthLayout   from '@/layouts/AuthLayout.vue'
 // import ProductList  from '@/views/products/ProductList.vue'
 // import ProductDetail from '@/views/products/ProductDetail.vue'
 
-// // admin pages
+// admin pages
+import Users          from '@/views/admin/Users.vue'
+import UserDetail     from '@/views/admin/UserDetail.vue'
 // import Items        from '@/views/admin/Items.vue'
 // import Item         from '@/views/admin/Item.vue'
 // import CreateItem   from '@/views/admin/CreateItem.vue'
@@ -84,6 +86,26 @@ const routes = [
             }
         ]
     },
+
+    {
+      path: '/admin',
+        component: AdminLayout,
+        children: [
+          {
+            path: 'users',
+            name: 'users',
+            component: Users,
+          },
+          {
+            path: 'user-detail/:id',
+            name: 'user-detail',
+            component: UserDetail,
+            props: true
+          }
+        ]
+
+
+    }
     // ★ 権限がない場合に表示するページ用のルートを追加
     // {
     //     path: '/unauthorized',
@@ -104,7 +126,6 @@ const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: routes
 })
-
 
 
 export default router

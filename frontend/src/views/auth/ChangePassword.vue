@@ -1,11 +1,12 @@
 <script setup>
-  import { reactive, ref, computed } from 'vue'
+  import { reactive, computed } from 'vue'
   import { useRouter } from 'vue-router'
 
   import { useAuthStore } from '@/stores/auth'
   import { useLoaderStore } from '@/stores/loader'
   import { changePasswordSchema } from '@/schemas/user-validation'
-  import apiClient from '@/api'
+  import { useFormValidation } from '@/composables/userFormValidation'
+  import { useNotificationStore } from '@/stores/notification';
 
   import authWrapper from '@/wrappers/authWrapper.vue';
   import Loader from '@/assets/icons/Loader.svg'
@@ -14,8 +15,8 @@
   const authStore = useAuthStore()
   const loaderStore = useLoaderStore()
   const router = useRouter()
+  const notificationStore = useNotificationStore();
 
-  const isFormValid = ref(false)
   const isButtonDisabled = computed(()=>{
     return (!isFormValid.value || loaderStore.loading )
   })
@@ -25,74 +26,14 @@
     new_password: '',
     password_confirmation: ''
   })
-  const errors = reactive({})
 
-  const validateForm = (formData)=>{
-    const result_raw = changePasswordSchema.safeParse(formData)
-    if (result_raw.success){
-      return { cleanData: result_raw.data, errors: null }
-    }else{
-      const errors = {}
-      const { formErrors, fieldErrors } = result_raw.error.flatten();
-      if (formErrors.length > 0) {
-        errors['root'] = formErrors[0];
-      }
-      for (const key in fieldErrors) {
-        const messages = fieldErrors[key];
-        if (messages) {
-          errors[key] = messages[0];
-        }
-      }
-      return { cleanData: null, errors: errors}
-    }
-  }
+  const { isFormValid,
+      errors,
+      onInput,
+      onBlur,
+      validateOnSubmit,
+      handleServerErrors} = useFormValidation(formData, changePasswordSchema)
 
-  const onInput = (e)=>{
-    const key = e.target.id
-    formData[key] = e.target.value
-
-    const result = validateForm(formData) // if節の中でなくここに書くのは、buttonのdisableのため
-    isFormValid.value = Boolean(result.cleanData)
-
-    if (key in errors){ //そのフィールドが追跡モードに入っていた場合
-      errors[key] = ''
-      if (result.errors?.[key]){
-        errors[key] = result.errors[key]
-      }
-    }
-  }
-  const onBlur = (e)=>{
-    const key = e.target.id
-    const result = validateForm(formData)
-    if (result.errors?.[key]){
-      errors[key] = result.errors[key] //そのフィールドを追跡モードに入れる
-    }
-  }
-
-  const validateOnSubmit = (formData)=>{
-    Object.keys(errors).forEach(key => { errors[key] = '' });
-    const result = validateForm(formData)
-
-    if (result.errors){
-      for (const key in result.errors){
-        errors[key] = result.errors[key]
-      }
-      return null
-    }else{
-      return result.cleanData
-    }
-  }
-
-  const handleServerErrors = (err) =>{
-    if (err.error_code !== 'VALIDATION_ERROR'){
-      errors.root = err['message'] || 'An unexpected error occurred.'
-    }else{
-      for (const field in err['errors_dic']){
-
-        errors[field] = err['errors_dic'][field]
-      }
-    }
-  }
 
   const onSubmit = async ()=>{
 
@@ -107,7 +48,7 @@
       authStore.accessToken = null
       authStore.user = null
       router.push({name: 'login'})
-      //notificationの表示をする
+      notificationStore.showNotification('Password has been updated. Please log in.', 'success');
 
     }catch(err){
       console.log('serverside error')
@@ -180,13 +121,10 @@
 
         <button
           type="submit"
-          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12 "
-          :class="{
-            '!cursor-not-allowed': isButtonDisabled,
-            '!from-neutral-400': isButtonDisabled,
-            '!to-neutral-400': isButtonDisabled,
-            '!scale-100': isButtonDisabled,
-          }"
+          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12
+            disabled:!cursor-not-allowed disabled:!from-neutral-400 disabled:!to-neutral-500 disabled:!scale-100
+          "
+
           :disabled="isButtonDisabled"
         >
           <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">

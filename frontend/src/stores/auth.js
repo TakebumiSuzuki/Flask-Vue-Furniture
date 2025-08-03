@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue'
-import apiClient from '@/api';
 
 
 export const useAuthStore = defineStore('auth', ()=>{
@@ -14,6 +13,8 @@ export const useAuthStore = defineStore('auth', ()=>{
 
 
   async function createUser(formData){
+    const apiClient = (await import('@/api')).default
+
     try{
       const { data } = await apiClient.post('/api/v1/auth/registration', formData)
 
@@ -56,9 +57,11 @@ export const useAuthStore = defineStore('auth', ()=>{
   }
 
   async function login(formData){
+    const apiClient = (await import('@/api')).default
+
     try{
       const { data } = await apiClient.post('/api/v1/auth/login', formData)
-      accessToken.value = data.accessToken
+      accessToken.value = data.access_token
       user.value = data.user
 
     }catch(err){
@@ -68,6 +71,8 @@ export const useAuthStore = defineStore('auth', ()=>{
   }
 
   async function logout(){
+    const apiClient = (await import('@/api')).default
+
     try{
       await apiClient.post('/api/v1/auth/logout', {}, { withCredentials: true })
       accessToken.value = null
@@ -80,8 +85,10 @@ export const useAuthStore = defineStore('auth', ()=>{
 
 
   async function updateUsername(formData){
+    const apiClient = (await import('@/api')).default
+
     try{
-      await apiClient.patch('/api/v1/update-username', formData)
+      await apiClient.patch('/api/v1/account/update-username', formData)
       user.username = formData.username
     }catch(err){
       const message = err?.response?.data?.message ?? 'Failed to update username. Please try again later'
@@ -90,6 +97,8 @@ export const useAuthStore = defineStore('auth', ()=>{
   }
 
   async function updatePassword(formData){
+    const apiClient = (await import('@/api')).default
+
     try{
       await apiClient.patch('/api/v1/account/update-password', formData)
       accessToken.value = null
@@ -103,16 +112,34 @@ export const useAuthStore = defineStore('auth', ()=>{
 
 
   async function deleteUser(){
+    const apiClient = (await import('@/api')).default
+
     try{
-      await apiClient.delete('/api/v1/auth/delete')
+      await apiClient.delete('/api/v1/account')
       accessToken.value = null
       user.value = null
     }catch(err){
       const message = err?.response?.data?.message ?? 'Failed to delete this account. Please try again later'
       throw new Error(message)
     }
+  }
 
+  async function deleteOtherUser(user_id){
+    const apiClient = (await import('@/api')).default
+    try{
+      await apiClient.delete(`/api/v1/admin/users/${user_id}/delete-user`)
+    }catch(err){
+      console.log('ユーザー削除失敗')
+    }
+  }
 
+  async function changeIsAdmin(user_id){
+    const apiClient = (await import('@/api')).default
+    try{
+      await apiClient.patch(`/api/v1/admin/users/${user_id}/change-role`)
+    }catch(err){
+      console.log('ユーザー削除失敗')
+    }
   }
 
 
@@ -127,6 +154,11 @@ export const useAuthStore = defineStore('auth', ()=>{
     updateUsername,
     updatePassword,
     deleteUser,
+    deleteOtherUser,
+    changeIsAdmin,
   }
 
-})
+},{
+    persist: true, // ここで永続化を有効にする
+  }
+)

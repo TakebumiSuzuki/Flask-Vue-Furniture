@@ -66,5 +66,6 @@ class ReadUser(BaseModel):
 class PublicUser(BaseModel):
     username: Annotated[str, Field(min_length=3, max_length=50)]
     email: EmailStr
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

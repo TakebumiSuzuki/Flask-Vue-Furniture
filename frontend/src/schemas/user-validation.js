@@ -41,10 +41,19 @@ export const createUserSchema = z.object({
     path: ["password_confirmation"], // このエラーはpassword_confirmationのエラーと分類される
   });
 
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .nonempty('Username is required.')
+    .email('Please enter a valid email address.'),
+  password: z
+    .string()
+    .nonempty('Password is required.')
+})
 
 
 export const changeUsernameSchema = z.object({
-  newUsername: z
+  username: z
     .string({
       required_error: 'New username is required.',
     })
