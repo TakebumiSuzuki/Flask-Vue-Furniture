@@ -68,11 +68,11 @@
 <template>
 
   <adminWrapper>
-    <div class="px-2 md:px-4 md:border-l">
+    <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest">All Users</h1>
 
       <div class="mt-12 pb-16 md:px-2 rounded-lg text-sm md:text-base">
-        <div class="px-2 md:px-4 grid grid-cols-[auto_20%_30%_8%_5%] items-center gap-2 md:gap-8 text-left border-b-2 pb-1 border-neutral-400 text-teal-400">
+        <div class="px-2 md:px-4 grid grid-cols-[auto_20%_25%_15%_12%] md:grid-cols-[auto_20%_25%_8%_5%] items-center gap-2 md:gap-8 text-left border-b-2 pb-1 border-neutral-500 text-teal-400">
           <p>ID</p>
           <p>Username</p>
           <p>Email</p>
@@ -83,8 +83,8 @@
         <RouterLink
           v-for="user in users"
           :to="{ name: 'user-detail', params: { id: user.id }  }"
-          class="py-3 px-2 md:px-4 text-sm md:text-base  border-neutral-400 border-dotted
-          grid grid-cols-[auto_20%_30%_8%_5%] gap-2 md:gap-8 items-center text-center border-b  [&>p]:text-left
+          class="py-3 px-2 md:px-4 text-sm md:text-base  border-neutral-500 border-dotted
+          grid grid-cols-[auto_20%_25%_15%_12%] md:grid-cols-[auto_20%_25%_8%_5%] gap-2 md:gap-8 items-center text-center border-b  [&>p]:text-left
           hover:bg-neutral-600 transition duration-200 ease-in-out hover:cursor-pointer"
           :key="user.id"
         >
@@ -96,7 +96,7 @@
             :checked="user.is_admin"
             @click.stop
             @change.prevent.stop="handleAdminChange(user.id)"
-            class="accent-teal-400 size-4"
+            class="accent-teal-600 size-4"
           >
           <button
             type="button"

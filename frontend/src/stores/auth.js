@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue'
-
+import  axios  from 'axios'
+const refreshTokenApiClientOnReload = axios.create({
+    withCredentials: true
+});
 
 export const useAuthStore = defineStore('auth', ()=>{
 
@@ -10,7 +13,7 @@ export const useAuthStore = defineStore('auth', ()=>{
   const isAuthenticated = computed(()=> Boolean(accessToken.value) )
   const isAdmin = computed(()=> user.value?.is_admin ?? false)
 
-
+  let isInitialRefreshDone = false
 
   async function createUser(formData){
     const apiClient = (await import('@/api')).default
@@ -143,6 +146,27 @@ export const useAuthStore = defineStore('auth', ()=>{
   }
 
 
+  async function refreshOnReload(){
+    console.log('リロードのリフレッシュを始めます')
+    if (!isInitialRefreshDone){
+      const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens', {}, {
+        withCredentials: true
+      })
+
+      if (response?.data.access_token){
+        console.log('リロードのリフレッシュでアクセストークンをゲットしました')
+        accessToken.value = response.data.access_token
+        // const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens')
+        // response.data
+
+      }else{
+        console.log('リロードのリフレッシュでアクセストークンの取得に失敗しました')
+      }
+    }
+    isInitialRefreshDone = true
+  }
+
+
   return {
     accessToken,
     user,
@@ -156,6 +180,7 @@ export const useAuthStore = defineStore('auth', ()=>{
     deleteUser,
     deleteOtherUser,
     changeIsAdmin,
+    refreshOnReload,
   }
 
 },{

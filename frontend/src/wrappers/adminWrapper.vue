@@ -4,17 +4,25 @@
 
 <template>
 
-  <div class="py-8 md:py-16 max-w-[1200px] w-full mx-auto ">
+  <div class="py-8 md:py-16 max-w-[1200px] w-full mx-auto">
 
     <div class="flex flex-col items-center justify-start
-      md:flex-row md:items-start md:justify-center gap-8">
+      md:flex-row md:items-start md:justify-center gap-0">
 
-      <div class="w-full md:w-[8%] flex flex-row items-center justify-center md:flex-col md:gap-2">
+      <div class="w-full md:w-[10%] flex flex-row items-end justify-center md:flex-col md:gap-3  md:pt-10 pb-4 max-md:divide-x-1">
+        <div class="pr-4 md:pr-6">
+          <RouterLink :to="{ name: 'users'}">
+            <span class="">Users</span>
+          </RouterLink>
 
-        <span class="px-6 max-md:border-r hover:cursor-pointer">Users</span>
-        <span class="px-6 hover:cursor-pointer">Furniture</span>
+        </div>
+        <div class="max-md:pl-4 md:pr-6">
+          <RouterLink :to="{ name: 'furnitures'}">
+            <span class="">Furniture</span>
+          </RouterLink>
+        </div>
       </div>
-      <div class="w-full md:w-[80%]">
+      <div class="w-full md:w-[80%] ">
         <slot></slot>
       </div>
 
