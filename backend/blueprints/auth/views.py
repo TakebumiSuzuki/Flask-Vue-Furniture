@@ -1,3 +1,4 @@
+from uuid import UUID
 from flask import Blueprint, jsonify, url_for, current_app
 from werkzeug.exceptions import Unauthorized, Conflict, BadRequest
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, set_refresh_cookies, unset_refresh_cookies, get_jwt_identity, get_jwt
@@ -6,6 +7,8 @@ from backend.extensions import db
 from backend.models.user import User
 from backend.schemas.user import CreateUser, PublicUser
 from backend.models.blocked_token import BlockedToken
+
+
 
 import time
 
@@ -26,7 +29,7 @@ def create_user(payload):
     if existing_email:
         raise Conflict('This email already exists.')
     user.set_password_hash(user.password)
-    user.is_admin = True #アドミン設定　
+    # user.is_admin = True #アドミン設定　
     db.session.add(user)
     db.session.commit()
     output = PublicUser.model_validate(user).model_dump()
@@ -91,7 +94,13 @@ def refresh_tokens():
     identity = get_jwt_identity()
     access_token = create_access_token(identity)
     refresh_token = create_refresh_token(identity)
-    response_body = jsonify({ 'access_token': access_token })
+
+    user = db.session.get(User, UUID(identity))
+    user.update_last_login_at()
+    db.session.commit()
+    output = PublicUser.model_validate(user).model_dump()
+    print(f'ユーザー情報 {output}')
+    response_body = jsonify({ 'access_token': access_token, 'user': output })
     set_refresh_cookies(response_body, refresh_token)
     return response_body, 200
 

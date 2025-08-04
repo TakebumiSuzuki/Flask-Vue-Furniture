@@ -147,21 +147,21 @@ export const useAuthStore = defineStore('auth', ()=>{
 
 
   async function refreshOnReload(){
-    console.log('リロードのリフレッシュを始めます')
     if (!isInitialRefreshDone){
-      const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens', {}, {
-        withCredentials: true
-      })
-
-      if (response?.data.access_token){
-        console.log('リロードのリフレッシュでアクセストークンをゲットしました')
+      try{
+        const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens', {}, {
+          withCredentials: true
+        })
+        console.log('リロードによるトークンゲットに成功しました')
         accessToken.value = response.data.access_token
-        // const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens')
-        // response.data
+        user.value = response.data.user
 
-      }else{
-        console.log('リロードのリフレッシュでアクセストークンの取得に失敗しました')
+      }catch(err){
+        console.log('リロードによるトークンゲットに失敗しました。')
+        accessToken.value = null
+        user.value = null
       }
+
     }
     isInitialRefreshDone = true
   }

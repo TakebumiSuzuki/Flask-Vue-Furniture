@@ -1,5 +1,6 @@
 <script setup>
-
+  import { useRoute } from 'vue-router';
+  const route = useRoute()
 </script>
 
 <template>
@@ -12,13 +13,13 @@
       <div class="w-full md:w-[10%] flex flex-row items-end justify-center md:flex-col md:gap-3  md:pt-10 pb-4 max-md:divide-x-1">
         <div class="pr-4 md:pr-6">
           <RouterLink :to="{ name: 'users'}">
-            <span class="">Users</span>
+            <span :class="{ 'text-teal-400 font-bold': route.name === 'users' || route.name === 'user-detail' }">Users</span>
           </RouterLink>
 
         </div>
         <div class="max-md:pl-4 md:pr-6">
           <RouterLink :to="{ name: 'furnitures'}">
-            <span class="">Furniture</span>
+            <span :class="{ 'text-teal-400 font-bold' : route.path === '/admin/furnitures' }">Furniture</span>
           </RouterLink>
         </div>
       </div>

@@ -67,5 +67,6 @@ class PublicUser(BaseModel):
     username: Annotated[str, Field(min_length=3, max_length=50)]
     email: EmailStr
     created_at: datetime
+    is_admin: bool
 
     model_config = ConfigDict(from_attributes=True)
