@@ -83,13 +83,13 @@
             Change Password
           </RouterLink>
 
-          <Button
+          <button
             type="button"
             class="btn bg-gradient-to-br from-pink-300/50 to-pink-500/60 hover:from-pink-300/90 hover:to-pink-500/90"
             @click="handleDeleteUser"
           >
             Delete Account
-          </Button>
+          </button>
 
         </div>
 

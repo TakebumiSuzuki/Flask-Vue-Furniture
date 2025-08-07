@@ -12,7 +12,7 @@ import time
 
 # ここでしている'/account'はあくまでデフォルトで、app.register_blueprint(account_bp, url_prefix='/api/v1/account')
 # により、完全に上書きされる。結合はされない。よってこの場合、'/account'は意味をなさない
-account_bp = Blueprint('account', __name__, url_prefix='/account')
+account_bp = Blueprint('account', __name__, url_prefix='/api/v1/account')
 
 # current_userについて:もしユーザーが見つからなければ、Flask-JWT-Extendedが自動的に
 # 401 Unauthorized エラーを返してくれるため、関数本体に処理が到達した時点では

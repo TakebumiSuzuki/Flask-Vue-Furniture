@@ -7,18 +7,15 @@ from backend.extensions import db
 from backend.models.user import User
 from backend.schemas.user import CreateUser, PublicUser
 from backend.models.blocked_token import BlockedToken
-
-
-
 import time
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+auth_bp = Blueprint('auth', __name__, url_prefix='/api/v1/auth')
 
 
 @auth_bp.post('/registration')
 @json_required
 def create_user(payload):
-    time.sleep(1)
+    time.sleep(0.5)
 
     dto = CreateUser.model_validate(payload).model_dump()
     user = User(**dto)
@@ -40,7 +37,7 @@ def create_user(payload):
 @auth_bp.post('/login')
 @json_required
 def login(payload):
-    time.sleep(1)
+    time.sleep(0.5)
 
     if 'email' not in payload or 'password' not in payload:
         raise BadRequest('Email and password are required')
@@ -66,7 +63,7 @@ def login(payload):
 @auth_bp.post('/logout')
 @jwt_required(refresh=True, locations=["cookies"])
 def logout():
-    time.sleep(1)
+    time.sleep(0.5)
 
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)
@@ -84,7 +81,7 @@ def logout():
 # ちなみに、@jwt_required() (または jwt_required(refresh=False) と同等) は、アクセストークンのみを有効とみなす。
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh_tokens():
-    time.sleep(1)
+    time.sleep(0.5)
 
     refresh_jti = get_jwt()['jti']
     blocked_token = BlockedToken(jti=refresh_jti)

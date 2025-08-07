@@ -14,5 +14,9 @@ input{
 }
 
 .validation-error-text{
-  @apply h-5 mb-0.5 text-sm text-right text-red-400
+  @apply mb-0.5 text-sm text-right text-red-400
+}
+
+html, body {
+  overscroll-behavior: none;
 }

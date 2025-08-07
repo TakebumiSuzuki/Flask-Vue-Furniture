@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 // import PublicLayout from '@/layouts/PublicLayout.vue'
+import AccountLayout from '@/layouts/AccountLayout.vue'
 import AdminLayout  from '@/layouts/AdminLayout.vue'
 import AuthLayout   from '@/layouts/AuthLayout.vue'
 import PublicLayout from '@/layouts/PublicLayout.vue'
@@ -18,6 +19,8 @@ import Unauthorized from '@/views/public/Unauthorized.vue'
 import Users          from '@/views/admin/Users.vue'
 import UserDetail     from '@/views/admin/UserDetail.vue'
 import Furnitures     from '@/views/admin/Furnitures.vue'
+import CreateFurniture from '@/views/admin/CreateFurniture.vue'
+import UpdateFurniture from '@/views/admin/UpdateFurniture.vue'
 // import Items        from '@/views/admin/Items.vue'
 // import Item         from '@/views/admin/Item.vue'
 // import CreateItem   from '@/views/admin/CreateItem.vue'
@@ -54,6 +57,7 @@ const routes = [
       // }
     ]
   },
+
   // {
   //     path: '/admin',
   //     component: AdminLayout,
@@ -80,6 +84,13 @@ const routes = [
         name: 'register',
         component: Register,
       },
+    ]
+  },
+
+  {
+    path: '/account',
+    component: AccountLayout,
+    children: [
       {
         path: 'change-username',
         name: 'change-username',
@@ -119,9 +130,22 @@ const routes = [
         meta: { requiresAuth: true, requiresAdmin: true}
       },
       {
+        path: 'furnitures/create',
+        name: 'furnitures-create',
+        component: CreateFurniture,
+        meta: { requiresAuth: true, requiresAdmin: true}
+      },
+      {
         path: 'furnitures',
         name: 'furnitures',
         component: Furnitures,
+        meta: { requiresAuth: true, requiresAdmin: true}
+      },
+      {
+        path: 'furnitures/:id',
+        name: 'furnitures-update',
+        component: UpdateFurniture,
+        props: true,
         meta: { requiresAuth: true, requiresAdmin: true}
       }
     ]

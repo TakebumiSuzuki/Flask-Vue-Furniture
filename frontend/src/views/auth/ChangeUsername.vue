@@ -95,7 +95,7 @@
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">
-            <Check/>
+            <Check class="size-5"/>
             Chage Username
           </div>
         </button>

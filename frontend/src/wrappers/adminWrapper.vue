@@ -19,7 +19,7 @@
         </div>
         <div class="max-md:pl-4 md:pr-6">
           <RouterLink :to="{ name: 'furnitures'}">
-            <span :class="{ 'text-teal-400 font-bold' : route.path === '/admin/furnitures' }">Furniture</span>
+            <span :class="{ 'text-teal-400 font-bold' : route.path.startsWith('/admin/furnitures') }">Furniture</span>
           </RouterLink>
         </div>
       </div>

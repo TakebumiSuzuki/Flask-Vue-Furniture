@@ -1,19 +1,21 @@
 <script setup>
   import { onMounted, ref } from 'vue'
   import apiClient from '@/api'
-  import { useRouter } from 'vue-router'
 
   import { useAuthStore} from '@/stores/auth'
   import { useNotificationStore} from '@/stores/notification'
   import { useAlertStore } from '@/stores/alert'
 
   import adminWrapper from '@/wrappers/adminWrapper.vue'
-  import CheckIcon from '@/assets/icons/Check.svg'
   import DeleteIcon from '@/assets/icons/Delete.svg'
+  import LoaderIcon from '@/assets/icons/Loader.svg'
+
+  import { useLoaderStore } from '@/stores/loader'
+
 
   const users = ref(null)
+  const loader = useLoaderStore()
 
-  const router = useRouter()
   const authStore = useAuthStore()
   const alertStore = useAlertStore()
   const notificationStore = useNotificationStore()
@@ -81,6 +83,7 @@
         </div>
 
         <RouterLink
+          v-if="!loader.loading"
           v-for="user in users"
           :to="{ name: 'user-detail', params: { id: user.id }  }"
           class="py-3 px-2 md:px-4 text-sm md:text-base  border-neutral-500 border-dotted
@@ -105,10 +108,15 @@
           >
             <!-- .preventによって<RouterLink>のデフォルト機能である画面遷移を止める。
               .stopによってバブルアップを止める-->
-            <DeleteIcon class="size-4"/>
+            <DeleteIcon class="size-5"/>
           </button>
 
         </RouterLink>
+
+        <div v-else>
+          <LoaderIcon class="animate-spin size-10 block mx-auto  text-teal-400/70 mt-14"/>
+        </div>
+
       </div>
 
     </div>

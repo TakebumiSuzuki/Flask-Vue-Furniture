@@ -132,7 +132,7 @@
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">
-            <Check/>
+            <Check class="size-5"/>
             Change Password
           </div>
         </button>

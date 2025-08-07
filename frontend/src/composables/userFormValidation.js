@@ -6,8 +6,8 @@ export function useFormValidation(formData, schema){
   const isFormValid = ref(false)
   const errors = reactive({})
 
-  const validateForm = ()=>{
-    const parsed_data = schema.safeParse(formData)
+  const validateForm = (data)=>{
+    const parsed_data = schema.safeParse(data)
 
     if (parsed_data.success){
       return { cleanData: parsed_data.data, errors: null }
@@ -30,8 +30,16 @@ export function useFormValidation(formData, schema){
 
   const onInput = (e)=>{
     const field = e.target.id
-    formData[field] = e.target.value
-
+    if (e.target.type === 'checkbox') {
+      formData[field] = e.target.checked
+    }else if (e.target.type === 'number') {
+      // `value`が空文字列の場合も考慮し、数値にパースする
+      const numValue = parseFloat(e.target.value);
+      formData[field] = isNaN(numValue) ? '' : numValue; // 不正な入力の場合は空文字などを設定
+      console.log(`Field: ${field}, Type: ${typeof formData[field]}, Value:`, formData[field]);
+    }else{
+      formData[field] = e.target.value
+    }
     const result = validateForm(formData) // if節の中でなくここに書くのは、buttonのdisableのため
     isFormValid.value = Boolean(result.cleanData)
 
@@ -51,9 +59,9 @@ export function useFormValidation(formData, schema){
     }
   }
 
-  const validateOnSubmit = ()=>{
+  const validateOnSubmit = (data)=>{
     Object.keys(errors).forEach(key => { errors[key] = '' });
-    const result = validateForm(formData)
+    const result = validateForm(data)
 
     if (result.errors){
       for (const field in result.errors){
@@ -66,12 +74,20 @@ export function useFormValidation(formData, schema){
   }
 
   const handleServerErrors = (err) =>{
-    if (err.error_code !== 'VALIDATION_ERROR'){
-      errors.root = err['message'] || 'An unexpected error occurred.'
-    }else{
-      for (const field in err['errors_dic']){
+    console.log(err.response)
+    if (err.response && err.response.data) {
+      const responseData = err.response.data;
 
-        errors[field] = err['errors_dic'][field]
+      if (responseData && responseData.error_code === 'RESOURCE_CONFLICT'){
+        errors.root = responseData.message
+
+      }else if(responseData && responseData.error_code === 'VALIDATION_ERROR'){
+        for (const field in responseData['errors_dic']){
+          errors[field] = responseData['errors_dic'][field]
+        }
+      }
+      else{
+        errors.root = responseData['message'] || 'An unexpected error occurred.'
       }
     }
   }
@@ -82,6 +98,7 @@ export function useFormValidation(formData, schema){
     errors,
     onInput,
     onBlur,
+    validateForm,
     validateOnSubmit,
     handleServerErrors
   };

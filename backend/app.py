@@ -10,6 +10,7 @@ from backend.errors import register_error_handlers
 from backend.blueprints.admin.views import admin_bp
 from backend.blueprints.auth.views import auth_bp
 from backend.blueprints.account.views import account_bp
+from backend.blueprints.furnitures.views import furnitures_bp
 
 
 def create_app(config_override=None) -> Flask:
@@ -34,6 +35,7 @@ def create_app(config_override=None) -> Flask:
     migrate.init_app(app, db)
     jwt.init_app(app)
 
+
     register_error_handlers(app, db)
     register_jwt_loaders(jwt, db)
 
@@ -43,9 +45,10 @@ def create_app(config_override=None) -> Flask:
         supports_credentials=True,
     )
 
-    app.register_blueprint(admin_bp,   url_prefix="/api/v1/admin")
-    app.register_blueprint(auth_bp,    url_prefix="/api/v1/auth")
-    app.register_blueprint(account_bp, url_prefix="/api/v1/account")
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(account_bp)
+    app.register_blueprint(furnitures_bp)
 
     # --- デバッグ用の情報表示 ---
     # デバッグモードが有効な場合のみ、URL一覧を表示する
