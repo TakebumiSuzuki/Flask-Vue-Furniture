@@ -20,3 +20,7 @@ input{
 html, body {
   overscroll-behavior: none;
 }
+.animated-underline{
+  @apply relative after:absolute after:bg-current after:h-[1px]  after:bottom-0 after:right-0 after:left-0
+    after:w-full after:rounded after:scale-x-0 after:origin-center hover:after:scale-x-100  after:transition after:duration-200 after:ease-in-out
+}

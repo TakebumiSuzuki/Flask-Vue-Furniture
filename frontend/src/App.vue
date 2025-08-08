@@ -4,8 +4,8 @@
 </script>
 
 <template >
-  <Alert/>
-  <Notification/>
+  <Alert class="z-1100"/>
+  <Notification class=" z-1000"/>
   <RouterView class="font-custom text-neutral-700" />
 
 </template>

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 
 // import PublicLayout from '@/layouts/PublicLayout.vue'
 import AccountLayout from '@/layouts/AccountLayout.vue'
@@ -179,6 +180,16 @@ router.beforeEach(async(to)=>{
     return { name: 'login' }
   }else if (to.meta.requiresAdmin && !authStore.isAdmin){
     return { name: 'unauthorized'}
+  }
+})
+
+router.afterEach(async(to)=>{
+  const notificationStore = useNotificationStore();
+  if (notificationStore.pendingNotification) {
+    const { msg, msgType } = notificationStore.pendingNotification;
+    notificationStore.showNotification(msg, msgType);
+
+    notificationStore.pendingNotification = null;
   }
 })
 

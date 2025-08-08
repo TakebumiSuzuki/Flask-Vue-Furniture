@@ -8,9 +8,10 @@ export const useNotificationStore = defineStore('notification', () => {
     const message = ref(null);
     const type = ref(null); // 'success', 'error', 'info' など
     const _timeoutId = ref(null); // 通知を自動で消すためのタイマーID
+    let pendingNotification = ref(null)
 
 
-    const showNotification = (msg, msgType = 'info', duration = 7000) => {
+    const showNotification = (msg, msgType = 'info', duration = 3000) => {
         // 既にタイマーが既に設定されている場合はクリア
         if (_timeoutId.value) {
             clearTimeout(_timeoutId.value);
@@ -43,6 +44,7 @@ export const useNotificationStore = defineStore('notification', () => {
         type,
         showNotification,
         hideNotification,
+        pendingNotification,
         // timeoutId は内部的に使うだけなので、通常は公開しない
     };
 });

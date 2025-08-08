@@ -178,9 +178,15 @@
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest">Add Furniture</h1>
 
-      <form @submit.prevent="onSubmit" class="max-w-[600px] w-full mx-auto mt-14 pb-24" novalidate>
+      <form @submit.prevent="onSubmit" class="max-w-[600px] w-full mx-auto mt-4 pb-24 " novalidate>
 
-        <p class="validation-error-text !text-center break-words"
+        <RouterLink :to="{name: 'furnitures'}">
+          <div class="text-neutral-300 size-fit px-0.5 animated-underline">
+            &laquo; Go Back
+          </div>
+        </RouterLink>
+
+        <p class="validation-error-text !text-center break-words mt-6"
             v-text="errors.root ? errors.root : ''"
         ></p>
 

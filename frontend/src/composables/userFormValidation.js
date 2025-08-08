@@ -74,7 +74,6 @@ export function useFormValidation(formData, schema){
   }
 
   const handleServerErrors = (err) =>{
-    console.log(err.response)
     if (err.response && err.response.data) {
       const responseData = err.response.data;
 
@@ -87,9 +86,12 @@ export function useFormValidation(formData, schema){
         }
       }
       else{
+        console.log('----レスポンスの内容----')
+
         errors.root = responseData['message'] || 'An unexpected error occurred.'
       }
     }
+    errors.root = err
   }
 
 

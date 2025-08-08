@@ -29,6 +29,17 @@ def get_userlist():
     return jsonify({'users': output}), 200
 
 
+@admin_bp.get('/users/<string:user_id>')
+@admin_required
+def get_user(user_id):
+    time.sleep(0.5)
+
+    user_id_uuid = UUID(user_id)
+    user = db.session.get(User, user_id_uuid)
+    output = ReadUser.model_validate(user).model_dump()
+    return jsonify({'user': output}), 200
+
+
 @admin_bp.patch('/users/<string:user_id>/change-role')
 @admin_required
 def change_role(user_id):
@@ -158,7 +169,7 @@ def get_furniture(id):
 @admin_required
 def delete_furniture(id):
     time.sleep(0.5)
-    
+
     furniture = db.session.get(Furniture, id)
     if furniture is None:
         # Flaskに組み込まれた404エラーを発生させるのが最も一般的でクリーンな方法です

@@ -46,8 +46,8 @@
     const { password_confirmation, ...payload } = cleanData
     try {
       await createUser(payload)
+      notificationStore.pendingNotification = { msg:'Registration done! Please log in!' ,msgType: 'success' }
       router.push({name: 'login'})
-      notificationStore.showNotification('Registration done! Please log in!', 'success');
 
     } catch (err) {
       console.log('serverside error')
@@ -135,13 +135,13 @@
 
         <button
           type="submit"
-          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12
+          class="btn w-full bg-gradient-to-br from-teal-400 to-teal-600 mt-12
             disabled:!cursor-not-allowed disabled:!from-neutral-400 disabled:!to-neutral-500 disabled:!scale-100
           "
           :disabled="isButtonDisabled"
         >
           <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">
-            <Loader class="animate-spin"/>
+            <Loader class="animate-spin size-6 text-neutral-50"/>
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">
@@ -149,6 +149,9 @@
             Register Now
           </div>
         </button>
+        <RouterLink :to="{name: 'login'}">
+          <p class="pt-1 font-medium text-right mr-2 text-teal-600/90 transition duration-300 ease-in-out">You have an account?</p>
+        </RouterLink>
       </form>
 
     </authWrapper>

@@ -41,8 +41,8 @@
     try{
       await updateUsername(cleanData)
       user.username = cleanData.username
+      notificationStore.pendingNotification = { msg:'Username has been updated.' ,msgType: 'success' }
       router.push({name: 'user-info'})
-      notificationStore.showNotification('Username has been updated.', 'success');
     }catch (err) {
       console.log('serverside error')
         handleServerErrors(err)
@@ -58,7 +58,7 @@
 
       <h1 class="text-4xl text-center pt-10 pb-4">Change Username</h1>
 
-      <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
+      <form @submit.prevent="onSubmit" class="block w-full px-4 pb-14" novalidate>
 
         <p class="validation-error-text !text-center"
             v-text="errors.root ? errors.root : ''"
@@ -91,7 +91,7 @@
           :disabled="isButtonDisabled"
         >
           <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">
-            <Loader class="animate-spin"/>
+            <Loader class="animate-spin size-5.5 text-neutral-50"/>
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">

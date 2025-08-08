@@ -4,6 +4,9 @@
   import Footer from '@/sections/Footer.vue';
 
   import MainVisual from '@/assets/images/mainvisual.jpg'
+
+  import { useAuthStore } from '@/stores/auth'
+  const authStore = useAuthStore()
 </script>
 
 <template>
@@ -13,6 +16,9 @@
 		</div>
 
     <Header class="relative z-300"/>
+    <div v-if="authStore.isAdmin" class="ralative z-250 w-full text-center bg-pink-600/70 py-0.5  text-white">
+      You are logged in as admin. Go to Admin Page
+    </div>
     <Main class="relative z-200"/>
 
     <Footer class="z-300"/>

@@ -39,7 +39,7 @@
   <Transition name="fade">
       <div
           v-if="isVisible"
-          class="fixed top-20 right-8 z-50 flex flex-col items-center min-w-[250px] backdrop-blur-xs bg-black/80 p-4 rounded-lg shadow-lg text-neutral-50/80"
+          class="fixed top-6 right-6 z-50 flex flex-col items-center min-w-[250px] backdrop-blur-xs bg-black/60 p-4 rounded-lg shadow-lg text-neutral-50/80"
       >
           <component
               v-if="currentIcon"

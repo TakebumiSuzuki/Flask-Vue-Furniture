@@ -1,5 +1,5 @@
 <script setup>
-  import { reactive, computed } from 'vue'
+  import { reactive, computed, nextTick } from 'vue'
   import { useAuthStore } from '@/stores/auth'
   import { loginSchema } from '@/schemas/user-validation.js'
   import { useLoaderStore } from '@/stores/loader'
@@ -43,11 +43,11 @@
 
     try{
       await login(cleanData)
-      router.push({name: 'user-info'})
-      notificationStore.showNotification('You have successfully logged in!', 'success');
+      notificationStore.pendingNotification = { msg:'You have successfully logged in!' ,msgType: 'success' }
+      await router.push({ name: 'home' })
 
     }catch (err) {
-      console.log('serverside error')
+      console.log('serverside error',err)
         handleServerErrors(err)
     }
   }
@@ -59,7 +59,7 @@
     <authWrapper>
       <h1 class="text-4xl text-center pt-10 pb-4">Login</h1>
 
-			<form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
+			<form @submit.prevent="onSubmit" class="block w-full px-4 pb-14" novalidate>
 
         <p class="validation-error-text !text-center"
             v-text="errors.root ? errors.root : ''"
@@ -99,21 +99,24 @@
 
 				<button
           type="submit"
-          class="btn w-full bg-gradient-to-br from-sky-400 to-indigo-400 mt-12
+          class="btn w-full bg-gradient-to-br from-teal-400/80 to-teal-600/80 mt-12
             disabled:!cursor-not-allowed disabled:!from-neutral-400 disabled:!to-neutral-500 disabled:!scale-100
           "
           :disabled="isButtonDisabled"
           >
           <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">
-            <Loader class="animate-spin"/>
+            <Loader class="animate-spin size-5.5 text-neutral-50"/>
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">
-            <Login/>
+            <Login class="size-6"/>
             Login
           </div>
 				</button>
-			</form>
+        <RouterLink :to="{name: 'register'}">
+          <p class="pt-1 font-medium text-right mr-2 text-teal-600/90 transition duration-300 ease-in-out">You haven't had account?</p>
+        </RouterLink>
+      </form>
 
 		</authWrapper>
 	</div>

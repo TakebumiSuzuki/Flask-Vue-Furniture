@@ -11,6 +11,10 @@
   import EmailIcon from '@/assets/icons/EmailIcon.svg'
   import CalendarIcon from '@/assets/icons/CalendarIcon.svg'
 
+  import IdIcon from '@/assets/icons/ID.svg'
+  import PasswordIcon from '@/assets/icons/Password.svg'
+  import DeleteIcon from '@/assets/icons/Delete.svg'
+
   import { formatDate } from '@/utilities'
 
   const authStore = useAuthStore()
@@ -36,8 +40,8 @@
     if (result){
       try{
         await authStore.deleteUser()
+        notificationStore.pendingNotification = { msg:'You have logged out.' ,msgType: 'success' }
         router.push({ name: 'login' })
-        notificationStore.showNotification('You have logged out.', 'success');
       }catch(err){
         console.log('ユーザーデリート処理中のエラーでました')
       }
@@ -68,27 +72,36 @@
           </dl>
         </div>
 
-        <div class="flex flex-col gap-4 ">
+        <div class="flex flex-col gap-4 px-4">
           <RouterLink
             :to="{ name: 'change-username' }"
-            class="btn bg-gradient-to-br from-neutral-400/80 to-neutral-500/80"
+            class="btn bg-gradient-to-br from-teal-400/90 to-teal-500/90"
           >
-            Change Username
+            <div class="flex items-center gap-2 justify-center">
+              <IdIcon class="size-7"/>
+              Change Username
+            </div>
           </RouterLink>
 
           <RouterLink
             :to="{ name: 'change-password' }"
-            class="btn bg-gradient-to-br from-neutral-400/80 to-neutral-500/80"
+            class="btn bg-gradient-to-br from-indigo-400/90 to-indigo-500/90"
           >
-            Change Password
+            <div class="flex items-center gap-2 justify-center">
+              <PasswordIcon class="size-6"/>
+              Change Password
+            </div>
           </RouterLink>
 
           <button
             type="button"
-            class="btn bg-gradient-to-br from-pink-300/50 to-pink-500/60 hover:from-pink-300/90 hover:to-pink-500/90"
+            class="btn bg-gradient-to-br from-pink-300/90 to-pink-500/90 hover:from-pink-300/90 hover:to-pink-500/90"
             @click="handleDeleteUser"
           >
-            Delete Account
+            <div class="flex items-center gap-2 justify-center">
+              <DeleteIcon class="size-6"/>
+              Delete Account
+            </div>
           </button>
 
         </div>

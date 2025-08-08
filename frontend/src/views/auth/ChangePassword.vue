@@ -47,8 +47,9 @@
       })
       authStore.accessToken = null
       authStore.user = null
+      notificationStore.pendingNotification = { msg:'Password has been updated. Please log in.' ,msgType: 'success' }
       router.push({name: 'login'})
-      notificationStore.showNotification('Password has been updated. Please log in.', 'success');
+
 
     }catch(err){
       console.log('serverside error')
@@ -128,7 +129,7 @@
           :disabled="isButtonDisabled"
         >
           <div v-if="loaderStore.loading" class="flex items-center gap-2 justify-center">
-            <Loader class="animate-spin"/>
+            <Loader class="animate-spin size-5.5 text-neutral-50"/>
             Processing
           </div>
           <div v-else class="flex items-center gap-2 justify-center">

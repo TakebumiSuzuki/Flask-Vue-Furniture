@@ -16,6 +16,8 @@
 
   import AdminWrapper from '@/wrappers/adminWrapper.vue'
 
+  import { formatDate } from '@/utilities'
+
 
   const router = useRouter()
   const notificationStore = useNotificationStore();
@@ -86,8 +88,10 @@
     handleServerErrors,
   } = useFormValidation(formData, updateFurnitureSchema)
 
-
-
+  const createdAt = ref(null)
+  const formatedCreatedAt = computed(()=>{ return formatDate(createdAt.value)})
+  const updatedAt = ref(null)
+  const formatedupdatedAt = computed(()=>{ return formatDate(updatedAt.value)})
 
   onMounted(async ()=>{
     try{
@@ -100,6 +104,10 @@
       formData['price'] = isNaN(numValue) ? '' : numValue;
       formData['featured'] = response.data['featured']
       formData['stock'] = response.data['stock']
+
+      updatedAt.value = response.data['updated_at']
+      createdAt.value = response.data['created_at']
+      console.log(updatedAt.value)
 
       originalData = { ...formData };
 
@@ -246,12 +254,26 @@
   }
 </script>
 
+
+
+
 <template>
   <AdminWrapper>
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest">Edit Furniture</h1>
 
-      <form @submit.prevent="onSubmit" class="max-w-[600px] w-full mx-auto mt-14 pb-24" novalidate>
+      <form @submit.prevent="onSubmit" class="max-w-[600px] w-full mx-auto mt-8 pb-24" novalidate>
+
+        <RouterLink :to="{name: 'furnitures'}">
+          <div class="text-neutral-300 size-fit px-0.5 animated-underline">
+            &laquo; Go Back
+          </div>
+        </RouterLink>
+
+        <div class="flex flex-col items-end mb-6 text-neutral-300 gap-0.5 text-sm">
+          <div>Created: {{ formatedCreatedAt }}</div>
+          <div>Last Update: {{ formatedupdatedAt }}</div>
+        </div>
 
         <p class="validation-error-text !text-center break-words"
             v-text="errors.root ? errors.root : ''"

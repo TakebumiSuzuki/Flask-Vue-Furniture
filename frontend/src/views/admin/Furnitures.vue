@@ -29,7 +29,7 @@
 
       <div class="flex justify-between items-center mb-10 px-2">
 
-        <input type="search" placeholder="Search..." class="md:!w-[70%] !border-neutral-500">
+        <input type="search" placeholder="Search..." class="md:!w-[60%] !border-neutral-500">
 
         <RouterLink :to="{name:'furnitures-create'}">
           <div class="bg-gradient-to-br from-teal-800/80 to-teal-500/80   max-md:hidden px-10 py-2.5 rounded-md hover:scale-105 active:scale-103 transition ease-in-out flex items-center gap-1">
