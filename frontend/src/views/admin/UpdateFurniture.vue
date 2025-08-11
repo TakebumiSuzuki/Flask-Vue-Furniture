@@ -260,7 +260,7 @@
 <template>
   <AdminWrapper>
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
-      <h1 class="text-center text-4xl tracking-widest">Edit Furniture</h1>
+      <h1 class="text-center text-4xl tracking-widest ">Edit Furniture</h1>
 
       <form @submit.prevent="onSubmit" class="max-w-[600px] w-full mx-auto mt-8 pb-24" novalidate>
 
@@ -275,9 +275,7 @@
           <div>Last Update: {{ formatedupdatedAt }}</div>
         </div>
 
-        <p class="validation-error-text !text-center break-words"
-            v-text="errors.root ? errors.root : ''"
-        ></p>
+        <p class="validation-error-text !text-center break-words">{{ errors.root || '\u00A0' }}</p>
 
         <div class="mb-4">
           <label for="name" class="mb-1 block text-teal-400">Product Name</label>
@@ -290,9 +288,7 @@
             @input="onInput($event)"
             @blur="onBlur($event)"
           >
-          <p class="validation-error-text !text-left"
-            v-text="errors.name ? errors.name : ''"
-          ></p>
+          <p class="validation-error-text !text-right break-words">{{ errors.name || '\u00A0' }}</p>
         </div>
 
 
@@ -307,9 +303,8 @@
             @input="onInput($event)"
             @blur="onBlur($event)"
           ></textarea>
-          <p class="validation-error-text !text-left"
-            v-text="errors.description ? errors.description : ''"
-          ></p>
+          <p class="validation-error-text !text-right">{{ errors.description || '\u00A0' }}</p>
+
         </div>
 
         <div class="mb-4">
@@ -328,9 +323,8 @@
             <option value="black">Black</option>
             <option value="gray">Gray</option>
           </select>
-          <p class="validation-error-text !text-left"
-            v-text="errors.color ? errors.color : ''"
-          ></p>
+          <p class="validation-error-text !text-left">{{ errors.color || '\u00A0' }}</p>
+
         </div>
 
         <div class="mb-4">
@@ -347,9 +341,7 @@
             @input="onInput($event)"
             @blur="onBlur($event)"
           >
-          <p class="validation-error-text !text-left"
-            v-text="errors.price ? errors.price : ''"
-          ></p>
+          <p class="validation-error-text !text-left">{{ errors.price || '\u00A0' }}</p>
         </div>
 
         <div class="mb-4">
@@ -365,9 +357,7 @@
               @blur="onBlur($event)"
             >
           </div>
-          <p class="validation-error-text !text-left"
-            v-text="errors.featured ? errors.featured : ''"
-          ></p>
+          <p class="validation-error-text !text-left">{{ errors.featured || '\u00A0' }}</p>
         </div>
 
         <div class="mb-4">
@@ -384,9 +374,7 @@
             @input="onInput($event)"
             @blur="onBlur($event)"
           >
-          <p class="validation-error-text !text-left"
-            v-text="errors.stock ? errors.stock : ''"
-          ></p>
+          <p class="validation-error-text !text-left">{{ errors.stock || '\u00A0' }}</p>
         </div>
 
 <!--  -->
@@ -406,9 +394,7 @@
               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
               v-text="image_url ? 'Change Picture':'Select Picture'"
             ></label>
-            <p class="validation-error-text !text-left mt-1 break-words"
-              v-text="imageFileError ? imageFileError : ''"
-            ></p>
+            <p class="validation-error-text !text-left mt-1 break-words">{{ imageFileError || '\u00A0' }}</p>
           </div>
           <div v-if="image_url" class="mt-3 mb-3 relative w-[70%]">
             <img :src="image_url" alt="Selected image" class=" aspect-auto object-contain object-center rounded-sm overflow-clip" >

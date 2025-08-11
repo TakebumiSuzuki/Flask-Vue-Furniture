@@ -60,16 +60,12 @@
 
       <form @submit.prevent="onSubmit" class="block w-full px-4 pb-14" novalidate>
 
-        <p class="validation-error-text !text-center"
-            v-text="errors.root ? errors.root : ''"
-        ></p>
+        <p class="validation-error-text !text-center">{{ errors.root || '\u00A0' }}</p>
 
         <div class="mb-4">
           <label for="username" class="sr-only">New Username</label>
 
-          <p class="validation-error-text"
-            v-text="errors.username ? errors.username : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.username || '\u00A0' }}</p>
 
           <input
             type="text"

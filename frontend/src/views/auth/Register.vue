@@ -65,15 +65,11 @@
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
 
-        <p class="validation-error-text !text-center"
-            v-text="errors.root ? errors.root : ''"
-        ></p>
+        <p class="validation-error-text !text-center">{{ errors.errors || '\u00A0' }}</p>
 
         <div class="mb-4">
           <label for="username" class="sr-only">Username</label>
-          <p class="validation-error-text"
-            v-text="errors.username ? errors.username : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.username || '\u00A0' }}</p>
           <input
             type="text"
             id="username"
@@ -87,9 +83,7 @@
 
         <div class="mb-4">
           <label for="email" class="sr-only">Email</label>
-          <p class="validation-error-text"
-            v-text="errors.email ? errors.email : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.email || '\u00A0' }}</p>
           <input
             type="email"
             id="email"
@@ -103,9 +97,7 @@
 
         <div class="mb-4">
           <label for="password" class="sr-only">Password</label>
-          <p class="validation-error-text"
-            v-text="errors.password ? errors.password : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.password || '\u00A0' }}</p>
           <input
             type="password"
             id="password"
@@ -119,9 +111,7 @@
 
         <div class="mb-4">
           <label for="password_confirmation" class="sr-only">Password Confirmation</label>
-          <p class="validation-error-text"
-            v-text="errors.password_confirmation ? errors.password_confirmation : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.password_confirmation || '\u00A0' }}</p>
           <input
             type="password"
             id="password_confirmation"

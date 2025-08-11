@@ -61,15 +61,11 @@
 
 			<form @submit.prevent="onSubmit" class="block w-full px-4 pb-14" novalidate>
 
-        <p class="validation-error-text !text-center"
-            v-text="errors.root ? errors.root : ''"
-        ></p>
+        <p class="validation-error-text !text-center">{{ errors.root || '\u00A0' }}</p>
 
         <div class="mb-4">
           <label for="email" class="sr-only">email</label>
-          <p class="validation-error-text"
-            v-text="errors.email ? errors.email : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.email || '\u00A0' }}</p>
           <input
             type="email"
             id="email"
@@ -83,9 +79,7 @@
 
         <div class="mb-4">
           <label for="password" class="sr-only">password</label>
-          <p class="validation-error-text"
-            v-text="errors.password ? errors.password : ''"
-          ></p>
+          <p class="validation-error-text">{{ errors.password || '\u00A0' }}</p>
           <input
             type="password"
             id="password"

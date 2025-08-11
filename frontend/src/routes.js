@@ -12,6 +12,7 @@ import PublicLayout from '@/layouts/PublicLayout.vue'
 // public pages
 import Home         from '@/views/public/Home.vue'
 import Unauthorized from '@/views/public/Unauthorized.vue'
+import HomeFurniture from '@/views/public/HomeFurniture.vue'
 // import ProductList  from '@/views/products/ProductList.vue'
 // import ProductDetail from '@/views/products/ProductDetail.vue'
 
@@ -52,6 +53,15 @@ const routes = [
         name: 'home',
         component: Home
       },
+      {
+        path: '/:id',
+        name: 'home-furniture',
+        component: HomeFurniture,
+        props: true,
+        meta: { requiresAuth: true, requiresAdmin: true}
+      },
+
+
       // { path: 'products',    name: 'product-list',   component: ProductList },
       // { path: 'product/:id', name: 'product-detail', component: ProductDetail,  props: true,
       //     meta: { requiresAuth: true },

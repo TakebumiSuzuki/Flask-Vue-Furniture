@@ -8,16 +8,17 @@
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen h-[1px]">
 
     <Header/>
-    <div v-if="authStore.isAdmin" class="ralative z-250 w-full text-center bg-pink-700/50 py-0.5  text-white">
+    <div v-if="authStore.isAdmin" class="ralative z-250 w-full text-center  bg-teal-500/80 py-0.5  text-white">
       You are logged in as admin. >> Go to
       <RouterLink :to="{'name': 'users'}">
         <span class="underline ">Admin Page</span>
       </RouterLink>
     </div>
-    <Main/>
+    <Main class="bg-gradient-to-br from-neutral-300 via-neutral-200 to-neutral-100"/>
+
     <Footer/>
 
   </div>

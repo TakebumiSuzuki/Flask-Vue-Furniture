@@ -68,7 +68,7 @@ apiClient.interceptors.response.use(
 
                     console.log('再度エラー前のAPIリクエスを送ります')
                     // 元のリクエストのヘッダーを更新
-                    originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                    originalRequest.headers.Authorization = `Bearer ${response.data.access_token}`;
                     // _refreshAttemptのフラグはこの部分で役に立つ。ここでループが発生しないように。
                     try {
                         const retryResponse = await apiClient(originalRequest);

@@ -66,16 +66,12 @@
       <h1 class="text-4xl text-center pt-10 pb-4">Change Password</h1>
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
-
-        <p class="validation-error-text !text-center"
-            v-text="errors.root ? errors.root : ''"
-        ></p>
+        
+        <p class="validation-error-text !text-center ">{{ errors.root || '\u00A0' }}</p>
 
         <div class="mb-4">
           <label for="old_password" class="sr-only">Current Password</label>
-          <p class="validation-error-text"
-            v-text="errors.old_password ? errors.old_password : ''"
-          ></p>
+          <p class="validation-error-text ">{{ errors.old_password || '\u00A0' }}</p>
           <input
             type="password"
             id="old_password"
@@ -89,9 +85,7 @@
 
         <div class="mb-4">
           <label for="new_password" class="sr-only">New Password</label>
-          <p class="validation-error-text"
-            v-text="errors.new_password ? errors.new_password : ''"
-          ></p>
+          <p class="validation-error-text ">{{ errors.new_password || '\u00A0' }}</p>
           <input
             type="password"
             id="new_password"
@@ -105,9 +99,7 @@
 
         <div class="mb-4">
           <label for="password_confirmation" class="sr-only">Password Confirmation</label>
-          <p class="validation-error-text"
-            v-text="errors.password_confirmation ? errors.password_confirmation : ''"
-          ></p>
+          <p class="validation-error-text ">{{ errors.password_confirmation || '\u00A0' }}</p>
           <input
             type="password"
             id="password_confirmation"

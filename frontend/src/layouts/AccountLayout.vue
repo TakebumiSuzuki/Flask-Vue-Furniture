@@ -16,8 +16,11 @@
 		</div>
 
     <Header class="relative z-300"/>
-    <div v-if="authStore.isAdmin" class="ralative z-250 w-full text-center bg-pink-600/70 py-0.5  text-white">
-      You are logged in as admin. Go to Admin Page
+    <div v-if="authStore.isAdmin" class="ralative z-250 w-full text-center bg-teal-500/80 py-0.5  text-white">
+      You are logged in as admin. >> Go to
+      <RouterLink :to="{'name': 'users'}">
+        <span class="underline ">Admin Page</span>
+      </RouterLink>
     </div>
     <Main class="relative z-200"/>
 

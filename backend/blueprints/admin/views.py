@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, url_for
-from sqlalchemy import select, desc
+from flask import Blueprint, jsonify, url_for, request
+from sqlalchemy import select, desc, or_, asc
 from uuid import UUID
 
 from backend.models.user import User
@@ -137,9 +137,63 @@ def update_furniture(payload, id):
 def get_furnitures():
     time.sleep(0.5)
 
+    PER_PAGE = 5
+
+    # q パラメータがURLに含まれていない場合、None を返す。
+    query = request.args.get('q')
+    sort = request.args.get('sort')
+    order = request.args.get('order')
+    page = request.args.get('p', 1, type=int)
+
+
     # もし、order_by を省略すると、データベースが、最も効率的だと判断した順序でデータを返します。
     # データが物理的にディスクに保存されている順序かもしれませんし、何らかのインデックスを利用した結果かもしれません
-    stmt = select(Furniture).order_by(desc(Furniture.updated_at))
+    stmt = select(Furniture)
+
+    if sort and order:
+        # クライアントからの sort パラメータをカラム名にマッピング
+        sort_map = {
+            'price': Furniture.price,
+            'stock': Furniture.stock,
+            'created': Furniture.created_at,
+            'updated': Furniture.updated_at
+        }
+        column = sort_map.get(sort)
+
+    if column:
+        if order.lower() in ['desc', 'dec']:
+            stmt = stmt.order_by(desc(column))
+        else:
+            stmt = stmt.order_by(asc(column))
+    else:
+        stmt = stmt.order_by(desc(Furniture.updated_at))
+
+    if query:
+        stmt = stmt.where(or_(
+                Furniture.name.ilike(f'%{query}%'),
+                Furniture.description.ilike(f'%{query}%'),
+                Furniture.color.ilike(f'{query}%')
+            ))
+
+    try:
+        pagination = db.paginate(stmt, page=page, per_page=PER_PAGE, error_out=True)
+    except:
+        # ページ番号が範囲外の場合（例：総ページ数を超えた場合）に404エラーを返す
+        return jsonify({'message': 'Page not found', 'error_code':'PAGE_NOT_FOUND'}), 404
+
+    furnitures = pagination.items
+    output = [ReadFurniture.model_validate(furniture).model_dump() for furniture in furnitures]
+
+    return jsonify({
+        'furnitures': output,
+        'total_items': pagination.total,
+        'total_pages': pagination.pages,
+        'current_page': pagination.page,
+        'has_next': pagination.has_next,
+        'has_prev': pagination.has_prev
+    }), 200
+
+    # 以下はページネーションを実装する前のコードとコメント
     # テーブルの結合をした場合や、カラムを複数指定してそれだけを取り出したい場合には、タプルとして表現されたrowオブジェクト
     # のリストが返ってくる。で、ここでは行あたり単一オブジェクトのリストであり、タプルで帰ってきて欲しくないので、scalars()をつける。
     # all()をつけるとリストとして全部が返ってくる。つけないとイテレーターが返ってくる。
@@ -147,7 +201,6 @@ def get_furnitures():
     output = [ReadFurniture.model_validate(furniture).model_dump() for furniture in furnitures]
 
     return jsonify(output), 200
-
 
 @admin_bp.get('/furnitures/<int:id>')
 @admin_required

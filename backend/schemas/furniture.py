@@ -74,6 +74,7 @@ class ReadFurniture(BaseModel):
         return str(image_url)
 
 class PublicFurniture(BaseModel):
+    id: Annotated[int, Field(ge=0)]
     name: Annotated[str, Field(min_length=3, max_length=50)]
     description: Annotated[str, Field(max_length=1000)]
     color: FurnitureColor
