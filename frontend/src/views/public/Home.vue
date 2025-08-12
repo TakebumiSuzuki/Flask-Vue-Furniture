@@ -7,11 +7,10 @@
   import { useAbortController } from '@/composables/useAbortController'
   import { useLoaderStore } from '@/stores/loader'
 
+  import Pagination from '@/components/Pagination.vue'
   import FurnitureCard from '@/components/FurnitureCard.vue'
   import Loader from '@/assets/icons/Loader.svg'
   import publicWrapper from '@/wrappers/publicWrapper.vue'
-  import Pagination from '@/components/Pagination.vue'
-
 
   // ここで onMounted が先に登録され、このコンポーネントの onMounted よりも先に実行される。
   const { addTarget, startObservation, prepareForUpdate } = useIntersectionObserver({ delayInterval: 100 })
@@ -20,148 +19,117 @@
 
   const furnitures = ref(null)
   const errors = ref(null)
-
-
-  // onMounted(async()=>{
-  //   // これより前に、冒頭でインポートした composable の方の onMounted が先に実行される。
-  //   try{
-  //     await fetchData()
-  //     startObservation()
-
-  //   }catch(err){
-  //     console.error(err)
-  //     errors.value = 'Failed to fetch the data. Please reload again later.'
-  //   }
-  // })
-  onMounted(async () => {
-  try {
-    await handleDataFetch();
-  } catch (err) {
-    console.error(err);
-    errors.value = 'Failed to fetch the data. Please reload again later.';
-  }
-});
-
   const query = ref('')
   const sort = ref('updated_desc')
   const sortField = computed(()=>{ return sort.value.split('_')[0]})
   const sortOrder = computed(()=>{ return sort.value.split('_')[1]})
   const paginationInfo = reactive({
-    currentPage: 1,
+    currentPage: 1, //ここにwatchを立てて、Paginationコンポーネントからイベントのイベントを監視
     totalPages: 1,
     totalItems: 0
   })
 
-  let timer = null;
-  // watchのコールバック関数の役割は、あくまでタイマーをセットするという同期的な処理だから asyncをつける必要はない。
-  // watch([query, sort], ()=>{
-  //   paginationInfo.currentPage = 1 // 1ページ目に戻す
-  //   if (timer !== null){
-  //     clearTimeout(timer)
-  //     timer = null
-  //   }
-  //   timer = setTimeout(async()=>{
-  //     // v-forの差分更新を回避し、ディレイタイムなどを完全にリフレッシュするためにここでいったん空にしている
-  //     furnitures.value = []
-  //     prepareForUpdate()
-  //     await fetchData()
-  //     startObservation()
-  //   }, 500)
-  // })
-
-  // watch(() => paginationInfo.currentPage, async (newPage, oldPage) => {
-  //   if (newPage !== oldPage) {
-  //     await fetchData();
-  //     // ページトップにスクロール（任意）
-  //     window.scrollTo(0, 0);
-  //   }
-  // });
-
-  watch([query, sort], () => {
-    paginationInfo.currentPage = 1 // 検索時は1ページ目に戻す
-    if (timer !== null){
-      clearTimeout(timer)
-    }
-    // デバウンス処理の後、新しい関数を呼ぶだけ
-    timer = setTimeout(handleDataFetch, 500)
-  })
-
-  // 2. ページ切り替え用のwatch
-  watch(() => paginationInfo.currentPage, async (newPage, oldPage) => { // ① async を追加
-  if (newPage !== oldPage) {
+  onMounted(async () => {
     try {
-      await handleDataFetch(); // ② await を追加
-      window.scrollTo(0, 0);
-    } catch (err) {
-      // もし handleDataFetch 内で予期せぬエラーが起きた場合、ここで捕捉できる
-      console.error('An error occurred during page transition:', err);
-      // ここでユーザーにエラー通知を出すなどの処理も可能
+      await handleDataFetch();
+
+    }catch(err){
+      console.error(err);
+      errors.value = 'Failed to fetch the data. Please reload again later.';
     }
-  }
-});
+  });
+
+  let timer = null;
+  watch(
+    [query, sort],
+    () => {
+      paginationInfo.currentPage = 1 // 検索時は1ページ目に戻す
+      if (timer !== null){
+        clearTimeout(timer)
+      }
+      timer = setTimeout(handleDataFetch, 500)
+    }
+  )
+
+  // reactive オブジェクトの特定のプロパティを監視する際にはこのような getter にする必要がある。
+  watch(
+    () => paginationInfo.currentPage,
+    (newPage, oldPage) => {
+      if (newPage !== oldPage) {
+        try {
+          handleDataFetch();
+          window.scrollTo(0, 0);
+        }catch(err){
+          // もし handleDataFetch 内で予期せぬエラーが起きた場合、ここで捕捉できる
+          console.error('An error occurred during page transition:', err);
+          // ここでユーザーにエラー通知を出すなどの処理も可能
+        }
+      }
+  });
 
 
   async function handleDataFetch() {
-  errors.value = ''
-    // v-forの差分更新を回避し、ディレイタイムなどを完全にリフレッシュするためにここでいったん空にしている
-  furnitures.value = []
-  prepareForUpdate()
+    try {
+      errors.value = ''
+      // v-forの差分更新を回避し、ディレイタイムなどを完全にリフレッシュするために必要
+      furnitures.value = []
 
-  await fetchData()
+      prepareForUpdate()
 
-  await startObservation()
-}
+      const data = await fetchData()
 
-  async function fetchData(){
-    errors.value = ''
-    const params = {
-      q: query.value,
-      sort: sortField.value,
-      order: sortOrder.value,
-      page: paginationInfo.currentPage
-    }
-    try{
-      const response = await apiClient.get(`/api/v1/furnitures`, {
-        params: params,
-        signal: getNewSignal()
-      })
-      if (response && response.data){
-
-        furnitures.value = response.data.furnitures
-        if (furnitures.value.length === 0){
-          errors.value = 'There is no items found.'
-        }
-        console.log(furnitures.value)
-        // ページネーション情報を更新
-        paginationInfo.totalPages = response.data.total_pages
-        paginationInfo.totalItems = response.data.total_items
-        // paginationInfo.currentPage = response.data.current_page
+      // 受け取ったデータでUIの状態を更新する
+      furnitures.value = data.furnitures
+      if (furnitures.value.length === 0) {
+        errors.value = 'There are no items found.'
       }
+      await startObservation()
+
+      // Paginationコンポーネントの状態を更新
+      paginationInfo.totalPages = data.total_pages
+      paginationInfo.totalItems = data.total_items
+
     }catch(err){
-      if (axios.isCancel(err)) { //ここのエラー判定でaxiosが必要
-        // リクエストがキャンセルされた場合は、エラーとして扱う必要はない
+      if (axios.isCancel(err)) {
         console.log('A request has been cancelled by AbortController.')
-      } else if (err.response && err.response.status === 404) {
-        // 404エラーの場合は、ページが存在しないか結果が0件
+        // キャンセルの場合はユーザーにエラーを見せる必要はない
+      }else if (err.response && err.response.status === 404) {
         furnitures.value = []
+        errors.value = 'Page not found or no results.'
         paginationInfo.totalPages = 1
         paginationInfo.totalItems = 0
-        console.log('Page not found or no results.')
-      }
-      else{
-        console.log(err)
-        errors.value = 'Failed to fetch data. Please try it again later.'
+      }else{
+        // その他の予期せぬエラー
+        console.error('An error occurred during data fetching process:', err);
+        errors.value = 'Failed to fetch data. Please try again later.'
       }
     }
   }
 
+async function fetchData(){
+  const params = {
+    q: query.value,
+    sort: sortField.value,
+    order: sortOrder.value,
+    page: paginationInfo.currentPage
+  }
+
+  const response = await apiClient.get(`/api/v1/furnitures`, {
+    params: params,
+    signal: getNewSignal() // これはサーバーには送られず、内部的に使うだけ
+  })
+
+  return response.data
+}
 
 </script>
+
+
 
 <template>
   <publicWrapper>
 
-    <div class="mb-8 md:mb-10 flex justify-between items-center gap-3 md:gap-6 px-1">
+    <div class="mb-4 md:mb-6 flex justify-between items-center gap-3 md:gap-6 px-1">
       <input type="search" v-model="query" class="!w-[40%] grow !border-neutral-500">
       <select v-model="sort" class="border py-2.5 px-3 rounded-md outline-none !border-neutral-500 shadow-sm focus:shadow-md">
         <option value="price_asc">Price: Low to High</option>
@@ -179,6 +147,12 @@
     </div>
 
     <div v-else-if="furnitures && furnitures.length > 0">
+      <p
+        class="text-center text-neutral-600 pb-2 md:pb-4 fade-in-element-from-left"
+        :ref="addTarget"
+      >
+        Total {{ paginationInfo.totalItems }} items
+      </p>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div
           v-for="(furniture) in furnitures"
@@ -196,11 +170,13 @@
           </RouterLink>
         </div>
       </div>
+
       <Pagination
         :totalPages="paginationInfo.totalPages"
         :currentPage="paginationInfo.currentPage"
         @update:currentPage="paginationInfo.currentPage = $event"
       />
+
     </div>
 
     <div v-else class="text-center mt-30">

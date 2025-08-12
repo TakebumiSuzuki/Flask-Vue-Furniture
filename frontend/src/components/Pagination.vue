@@ -1,61 +1,5 @@
-<template>
-  <nav v-if="totalPages > 1" aria-label="Pagination">
-    <ul class="flex justify-center items-center gap-2 mt-10">
-      <!-- 「前へ」ボタン -->
-      <li>
-        <button
-          @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          class="px-3 py-1 rounded-md transition ease-in-out"
-          :class="{
-            'bg-neutral-700 text-neutral-400 cursor-not-allowed': currentPage === 1,
-            'bg-neutral-800 hover:bg-teal-600': currentPage !== 1
-          }"
-        >
-          &laquo;
-        </button>
-      </li>
-
-      <!-- ページ番号 -->
-      <li v-for="page in pages" :key="page">
-        <!-- クリック可能なページ番号 -->
-        <button
-          v-if="page !== '...'"
-          @click="changePage(page)"
-          class="px-3 py-1 rounded-md transition ease-in-out"
-          :class="{
-            'bg-teal-500 font-bold': page === currentPage,
-            'bg-neutral-800 hover:bg-teal-600': page !== currentPage
-          }"
-        >
-          {{ page }}
-        </button>
-        <!-- 省略記号 -->
-        <span v-else class="px-3 py-1 text-neutral-400">...</span>
-      </li>
-
-      <!-- 「次へ」ボタン -->
-      <li>
-        <button
-          @click="changePage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-          class="px-3 py-1 rounded-md transition ease-in-out"
-          :class="{
-            'bg-neutral-700 text-neutral-400 cursor-not-allowed': currentPage === totalPages,
-            'bg-neutral-800 hover:bg-teal-600': currentPage !== totalPages
-          }"
-        >
-          &raquo;
-        </button>
-      </li>
-    </ul>
-  </nav>
-</template>
-
-
-
 <script setup>
-  import { defineProps, defineEmits, computed } from 'vue';
+  import { computed } from 'vue';
 
   const props = defineProps({
     totalPages: {
@@ -82,7 +26,7 @@
     }
   };
 
-  // 表示するページ番号の配列を動的に計算
+  // 表示するページ番号の配列を動的に計算。戻り値は rangeという配列
   const pages = computed(() => {
     const range = [];
     const { totalPages, currentPage, maxVisibleButtons } = props;
@@ -123,4 +67,69 @@
 
     return range;
   });
+
 </script>
+
+
+
+<template>
+  <nav v-if="totalPages > 1" aria-label="Pagination">
+    <ul class="flex justify-center items-center gap-3 mt-10">
+      <!-- 「前へ」ボタン -->
+      <li>
+        <button
+          @click="changePage(currentPage - 1)"
+          :disabled="currentPage === 1"
+          class="px-3 py-1 rounded-md transition ease-in-out"
+          :class="{
+            'bg-neutral-600 text-neutral-500 cursor-not-allowed': currentPage === 1,
+            'bg-neutral-700 hover:bg-teal-600 text-neutral-300 cursor-pointer': currentPage !== 1
+          }"
+        >
+          &laquo;
+        </button>
+      </li>
+
+      <!-- ページ番号 -->
+      <li v-for="page in pages" :key="page">
+
+        <!-- クリック可能なページ番号 -->
+        <button
+          v-if="page !== '...'"
+          @click="changePage(page)"
+          class="px-3 py-1 rounded-md transition ease-in-out"
+          :class="{
+            'bg-teal-500 text-neutral-100 underline cursor-not-allowed' : page === currentPage,
+            'bg-neutral-700 hover:bg-teal-600 text-neutral-300 cursor-pointer': page !== currentPage
+          }"
+        >
+          {{ page }}
+        </button>
+
+        <!-- 省略記号 -->
+        <span v-else class="px-3 py-1 text-neutral-300">
+          ...
+        </span>
+
+      </li>
+
+      <!-- 「次へ」ボタン -->
+      <li>
+        <button
+          @click="changePage(currentPage + 1)"
+          :disabled="currentPage === totalPages"
+          class="px-3 py-1 rounded-md transition ease-in-out"
+          :class="{
+            'bg-neutral-600 text-neutral-500 cursor-not-allowed': currentPage === totalPages,
+            'bg-neutral-700 hover:bg-teal-600 text-neutral-300 cursor-pointer': currentPage !== totalPages
+          }"
+        >
+          &raquo;
+        </button>
+      </li>
+    </ul>
+  </nav>
+</template>
+
+
+

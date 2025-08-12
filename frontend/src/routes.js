@@ -8,14 +8,10 @@ import AdminLayout  from '@/layouts/AdminLayout.vue'
 import AuthLayout   from '@/layouts/AuthLayout.vue'
 import PublicLayout from '@/layouts/PublicLayout.vue'
 
-
 // public pages
 import Home         from '@/views/public/Home.vue'
 import Unauthorized from '@/views/public/Unauthorized.vue'
 import HomeFurniture from '@/views/public/HomeFurniture.vue'
-// import ProductList  from '@/views/products/ProductList.vue'
-// import ProductDetail from '@/views/products/ProductDetail.vue'
-
 
 // admin pages
 import Users          from '@/views/admin/Users.vue'
@@ -23,11 +19,6 @@ import UserDetail     from '@/views/admin/UserDetail.vue'
 import Furnitures     from '@/views/admin/Furnitures.vue'
 import CreateFurniture from '@/views/admin/CreateFurniture.vue'
 import UpdateFurniture from '@/views/admin/UpdateFurniture.vue'
-// import Items        from '@/views/admin/Items.vue'
-// import Item         from '@/views/admin/Item.vue'
-// import CreateItem   from '@/views/admin/CreateItem.vue'
-// import EditItem     from '@/views/admin/EditItem.vue'
-
 
 // auth pages
 import Login          from '@/views/auth/Login.vue'
@@ -58,29 +49,10 @@ const routes = [
         name: 'home-furniture',
         component: HomeFurniture,
         props: true,
-        meta: { requiresAuth: true, requiresAdmin: true}
+        meta: { requiresAuth: true}
       },
-
-
-      // { path: 'products',    name: 'product-list',   component: ProductList },
-      // { path: 'product/:id', name: 'product-detail', component: ProductDetail,  props: true,
-      //     meta: { requiresAuth: true },
-      // }
     ]
   },
-
-  // {
-  //     path: '/admin',
-  //     component: AdminLayout,
-  //     meta: { requiresAuth: true, requiresAdmin: true }, // ★ このルートとその子ルートは認証が必要
-  //     children: [
-  //         { path: 'items',            name: 'admin-items',         component: Items },
-  //         { path: 'items/create',     name: 'admin-item-create',   component: CreateItem },
-  //         { path: 'items/:id',        name: 'admin-item-detail',   component: Item,          props: true },
-  //         { path: 'items/:id/edit',   name: 'admin-item-edit',     component: EditItem,      props: true },
-  //     ]
-  // },
-
   {
     path: '/auth',
     component: AuthLayout,
@@ -97,7 +69,6 @@ const routes = [
       },
     ]
   },
-
   {
     path: '/account',
     component: AccountLayout,
@@ -122,7 +93,6 @@ const routes = [
       }
     ]
   },
-
   {
   path: '/admin',
     component: AdminLayout,
@@ -161,7 +131,6 @@ const routes = [
       }
     ]
   },
-
   {
     path: '/:catchAll(.*)',
     redirect: '/'
@@ -174,6 +143,8 @@ const router = createRouter({
 })
 
 router.beforeEach(async(to)=>{
+  const notificationStore = useNotificationStore();
+
   const authStore = useAuthStore()
   // 認証初期化がまだなら、完了するのを待つ
   if (!authStore.isInitialRefreshDone) {
@@ -187,6 +158,7 @@ router.beforeEach(async(to)=>{
     }
   }
   if (to.meta.requiresAuth && !authStore.isAuthenticated){
+    notificationStore.pendingNotification = { msg:'Please log in to see this page.' ,msgType: 'info' }
     return { name: 'login' }
   }else if (to.meta.requiresAdmin && !authStore.isAdmin){
     return { name: 'unauthorized'}

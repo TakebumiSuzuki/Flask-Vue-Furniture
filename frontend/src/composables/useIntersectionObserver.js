@@ -45,7 +45,6 @@ export function useIntersectionObserver(options = {}){
   }
 
   onMounted(() => {
-    console.log('onMountedが呼ばれています')
     observer = createObserver()
   })
 

@@ -60,8 +60,15 @@
 <template>
   <div>
     <authWrapper>
+      <div class="block w-full px-4 pt-4 font-mideum text-teal-600">
+        <RouterLink :to="{name: 'home'}">
+          <div class=" size-fit px-0.5 animated-underline">
+            &laquo; Home
+          </div>
+        </RouterLink>
+      </div>
 
-      <h1 class="text-4xl text-center pt-10 pb-4">Create Account</h1>
+      <h1 class="text-4xl text-center pt-4 pb-4">Create Account</h1>
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
 

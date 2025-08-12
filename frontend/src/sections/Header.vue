@@ -39,18 +39,18 @@
 </script>
 
 <template>
-  <header class="relative px-4 md:px-8 bg-neutral-50 shadow-lg">
+  <header class="relative px-4 md:px-8 bg-neutral-700 shadow-lg">
     <div class="py-6 max-w-[1200px] w-full mx-auto ">
       <div class="flex items-center justify-between">
         <div>
           <RouterLink :to="{name: 'home'}">
-            <Logo alt="logo" class="text-neutral-700 !w-60 md:!w-70 hover:scale-103 transition"/>
+            <Logo alt="logo" class="text-neutral-200 !w-60 md:!w-70 hover:scale-103 transition"/>
           </RouterLink>
         </div>
 
 
         <div
-          class="text-neutral-50 font-medium md:hidden absolute top-0 left-0 w-50 h-screen backdrop-blur-xs bg-neutral-600/80 transition duration-300 ease-in-out text-lg  z-300"
+          class="text-neutral-50 font-medium md:hidden absolute top-0 left-0 w-50 h-screen backdrop-blur-xs bg-neutral-800/80 transition duration-300 ease-in-out text-lg  z-300"
           :class="showSidePane ? 'translate-x-0': '-translate-x-50'"
           @click="showSidePane = false"
         >
@@ -151,12 +151,12 @@
 
         <div class="font-semibold">
 
-          <div class="max-md:hidden">
+          <div class="max-md:hidden text-neutral-200">
             <div v-if="authStore.isAuthenticated" class="flex items-center gap-6 mr-4">
 
               <RouterLink :to="{name: 'user-info'}"><UserIcon class="size-6.5 hover:scale-110 transition"/></RouterLink>
 
-              <button type="button" @click="handleLogout" class="hover:cursor-pointer hover:scale-110 transition animated-underline  text-lg">Logout</button>
+              <button type="button" @click="handleLogout" class="hover:cursor-pointer hover:scale-110 transition animated-underline text-lg">Logout</button>
             </div>
             <div v-else class="flex items-center gap-8 mr-4">
                 <RouterLink :to="{name: 'login'}" class="hover:scale-110 transition animated-underline  text-lg">Login</RouterLink>
@@ -167,15 +167,15 @@
           <div class="md:hidden">
             <div class="relative size-7.5  mr-2 hover:cursor-pointer" @click="toggleSidePane">
               <div
-                class="h-[2px] w-full absolute top-1/2 -translate-y-[calc(0.65rem+1px)] left-0 bg-neutral-700 transition duration-300 ease-in-out"
+                class="h-[2px] w-full absolute top-1/2 -translate-y-[calc(0.65rem+1px)] left-0 bg-neutral-200 transition duration-300 ease-in-out"
                 :class="showSidePane ? 'rotate-405 !-translate-y-[1px]':''"
               ></div>
               <div
-                class="h-[2px] w-full absolute top-1/2 -translate-y-[1px] left-0 bg-neutral-700  transition duration-300 ease-in-out"
+                class="h-[2px] w-full absolute top-1/2 -translate-y-[1px] left-0 bg-neutral-200  transition duration-300 ease-in-out"
                 :class="showSidePane ? 'opacity-0':''"
                 ></div>
               <div
-                class="h-[2px] w-full absolute bottom-1/2 translate-y-[calc(0.65rem+1px)] left-0 bg-neutral-700 transition duration-300 ease-in-out"
+                class="h-[2px] w-full absolute bottom-1/2 translate-y-[calc(0.65rem+1px)] left-0 bg-neutral-200 transition duration-300 ease-in-out"
                 :class="showSidePane ? '-rotate-405 !translate-y-[1px]':''"
               ></div>
             </div>
