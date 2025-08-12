@@ -4,12 +4,15 @@ from sqlalchemy import select, desc
 from backend.extensions import db
 from backend.models.furniture import Furniture
 from backend.schemas.furniture import PublicFurniture
+import time
 
 
 furnitures_bp = Blueprint('furnitures', __name__, url_prefix='/api/v1/furnitures')
 
 @furnitures_bp.get('')
 def get_furnitures():
+    time.sleep(0.5)
+
     stmt = select(Furniture).order_by(desc(Furniture.updated_at))
     furnitures = db.session.execute(stmt).scalars().all()
     output = [PublicFurniture.model_validate(furniture).model_dump() for furniture in furnitures]
@@ -18,6 +21,8 @@ def get_furnitures():
 
 @furnitures_bp.get('/<int:id>')
 def get_furniture(id):
+    time.sleep(0.5)
+    
     # DB接続エラーなどの場合には、sal_alchemyの例外が排出される。
     # IDに対応するレコードが見つからなかった場合にはNoneが返される
     furniture = db.session.get(Furniture, id)

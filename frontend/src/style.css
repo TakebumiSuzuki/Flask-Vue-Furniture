@@ -24,3 +24,21 @@ html, body {
   @apply relative after:absolute after:bg-current after:h-[1px]  after:bottom-0 after:right-0 after:left-0
     after:w-full after:rounded after:scale-x-0 after:origin-center hover:after:scale-x-100  after:transition after:duration-200 after:ease-in-out
 }
+
+.fade-in-element {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+.fade-in-element-from-left {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+/* 画面内に入ったときに適用される状態 */
+.fade-in-element.is-visible,
+.fade-in-element-from-left.is-visible {
+  opacity: 1;
+  transform: translate(0);
+}

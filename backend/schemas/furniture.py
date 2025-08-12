@@ -83,7 +83,8 @@ class PublicFurniture(BaseModel):
     stock: Annotated[int, Field(ge=0)] # min=0は v1での書き方
     # EmailStrと違いHttpUrlは別途インストールする必要はない
     image_url: Annotated[HttpUrl|None, Field(max_length=256)]
-
+    updated_at: datetime
+    
     model_config = ConfigDict(from_attributes=True)
 
     @field_serializer('image_url')
