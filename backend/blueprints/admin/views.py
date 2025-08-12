@@ -161,7 +161,7 @@ def get_furnitures():
         column = sort_map.get(sort)
 
     if column:
-        if order.lower() in ['desc', 'dec']:
+        if order.lower() in ['desc']:
             stmt = stmt.order_by(desc(column))
         else:
             stmt = stmt.order_by(asc(column))

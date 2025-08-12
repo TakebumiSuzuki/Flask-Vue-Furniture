@@ -1,42 +1,40 @@
-import { onMounted, ref, onUnmounted, nextTick, onBeforeUpdate, onUpdated } from 'vue'
+import { onMounted, ref, onUnmounted, nextTick } from 'vue'
 
 // インスタンス化の時に options={ delayInterval: 100 }のようにすると、各要素に100msの時間差ができる
 export function useIntersectionObserver(options = {}){
-
-  const fadeElements = ref([])
-  let observer = null
-  let delayMultiplier = 0
-
   const defaultOptions = {
     root: null,
     rootMargin: '0px',
     threshold: 0.1,
-    className: 'is-visible'
+    intersectingClass: 'is-visible',
+    delayInterval: 100
   }
-
   // 後から記述されたもの（options）が前のもの（defaultOptions）を上書きしする。
   const config = {
     ...defaultOptions,
     ...options,
-    delayInterval: options.delayInterval || 100
   }
 
-  const registerElement = (el)=>{
+  let observer = null
+  let elementId = 0
+  const targetElements = ref([])
+
+  const addTarget = (el)=>{
     if(el){
-      el.dataset.fadeDelay = delayMultiplier * config.delayInterval
-      delayMultiplier++
-      fadeElements.value.push(el)
+      el.dataset.elementId = elementId
+      elementId++
+      targetElements.value.push(el)
     }
   }
 
   const createObserver = ()=>{
     return new IntersectionObserver(
     (entries, observer)=>{
-      entries.forEach((entry)=>{
+      entries.sort((a, b) => a.target.dataset.elementId - b.target.dataset.elementId).forEach((entry)=>{
         if (entry.isIntersecting){
-          const delayTime = entry.target.dataset.fadeDelay || 0
+          const delayTime = entry.target.dataset.elementId * config.delayInterval || 0
           setTimeout(()=>{
-            entry.target.classList.add(config.className)
+            entry.target.classList.add(config.intersectingClass)
           }, delayTime)
           observer.unobserve(entry.target)
         }
@@ -46,42 +44,41 @@ export function useIntersectionObserver(options = {}){
     )
   }
 
-  // この関数は呼び出し元でも使う必要あり。
-  const observeElements = async () => {
+  onMounted(() => {
+    console.log('onMountedが呼ばれています')
+    observer = createObserver()
+  })
+
+  const prepareForUpdate = () => {
+    elementId = 0
+    // 既存のobserver登録をクリーンアップ
+    targetElements.value.forEach(el => {
+      if (el && observer){
+        el.classList.remove(config.intersectingClass)
+        observer.unobserve(el)
+      }
+    })
+    targetElements.value = []
+  }
+
+  const startObservation = async () => {
     await nextTick()
-    fadeElements.value.forEach(el => {
+    targetElements.value.forEach(el => {
       if (el && observer) observer.observe(el)
     })
   }
 
-  onMounted(() => {
-    observer = createObserver()
-  })
-
-  // これらonBeforeUpdateとonUpdatedはonMountedとは一緒には呼ばれない。
-  // onMounted後にリアクティブな値がアップデートされ、再レンダリングするときに呼ばれる。　
-  onBeforeUpdate(() => {
-    delayMultiplier = 0
-    // 既存のobserver登録をクリーンアップ
-    fadeElements.value.forEach(el => {
-      if (el && observer) observer.unobserve(el)
-    })
-    fadeElements.value = []
-  })
-
-  onUpdated(()=>{
-    observeElements()
-  })
-
   onUnmounted(() => {
+    console.log('onUnMountedが呼ばれています')
     if (observer) {
       observer.disconnect()
     }
   })
 
   return {
-    registerElement,
-    observeElements,
+    addTarget,
+    startObservation,
+    prepareForUpdate,
   }
 }
 

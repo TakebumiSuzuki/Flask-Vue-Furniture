@@ -28,12 +28,12 @@ html, body {
 .fade-in-element {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  /* transition: opacity 0.5s ease-out, transform 0.5s ease-out; */
 }
 .fade-in-element-from-left {
   opacity: 0;
   transform: translateX(-20px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  /* transition: opacity 0.5s ease-out, transform 0.5s ease-out; */
 }
 
 /* 画面内に入ったときに適用される状態 */
@@ -41,4 +41,5 @@ html, body {
 .fade-in-element-from-left.is-visible {
   opacity: 1;
   transform: translate(0);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
