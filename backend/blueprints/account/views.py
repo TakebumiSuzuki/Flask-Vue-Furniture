@@ -21,7 +21,7 @@ account_bp = Blueprint('account', __name__, url_prefix='/api/v1/account')
 @account_bp.get('')
 @jwt_required()
 def get_user():
-    time.sleep(1)
+    time.sleep(0.5)
 
     output = PublicUser.model_validate(current_user).model_dump()
     return jsonify({'user': output}), 200
@@ -30,7 +30,7 @@ def get_user():
 @account_bp.delete('')
 @jwt_required()
 def delete_user():
-    time.sleep(1)
+    time.sleep(0.5)
 
     # Blocklistにrefresh_tokenを登録する必要はない。つまりそもそもrefresh_tokenをいじる必要はない。
     # なぜなら User Lookup loaderによって、Userを見つけられずにエラーになりそこで弾かれるので。
@@ -48,7 +48,7 @@ def delete_user():
 @jwt_required()
 @json_required
 def username_change(payload):
-    time.sleep(1)
+    time.sleep(0.5)
 
     dto = ChangeUsernameUser.model_validate(payload)
 
@@ -64,7 +64,7 @@ def username_change(payload):
 @jwt_required()
 @json_required
 def password_update(payload):
-    time.sleep(1)
+    time.sleep(0.5)
 
     dto = ChangePasswordUser.model_validate(payload)
 

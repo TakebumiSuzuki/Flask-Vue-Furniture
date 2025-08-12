@@ -3,6 +3,6 @@
 </script>
 
 <template>
-  管理者じゃないと。アクセスできません。
+  Only admin account can see this page.
 
 </template>

@@ -11,7 +11,7 @@
 
   import { useFormValidation } from '@/composables/userFormValidation'
 
-  import authWrapper from '@/wrappers/authWrapper.vue';
+  import AuthWrapper from '@/wrappers/AuthWrapper.vue';
 
   const isButtonDisabled = computed(()=>{
     return (!isFormValid.value || loaderStore.loading )
@@ -54,7 +54,7 @@
 
 <template>
   <div>
-    <authWrapper>
+    <AuthWrapper>
 
       <h1 class="text-4xl text-center pt-10 pb-4">Change Username</h1>
 
@@ -97,6 +97,6 @@
         </button>
       </form>
 
-    </authWrapper>
+    </AuthWrapper>
   </div>
 </template>

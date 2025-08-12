@@ -6,7 +6,7 @@
 
   import { formatDate } from '@/utilities'
   import Loader from '@/assets/icons/Loader.svg'
-  import publicWrapper from '@/wrappers/publicWrapper.vue'
+  import PublicWrapper from '@/wrappers/PublicWrapper.vue'
 
   const { startObservation, addTarget  } = useIntersectionObserver({ delayInterval: 100 })
   const loaderStore = useLoaderStore()
@@ -46,7 +46,7 @@
 </script>
 
 <template>
-  <publicWrapper>
+  <PublicWrapper>
     <div v-if="furniture">
       <h1
         class="text-4xl font-medium text-center mt-4 fade-in-element"
@@ -97,7 +97,7 @@
       <Loader class="mx-auto size-10 animate-spin text-teal-400 mt-20"/>
     </div>
     <div v-else class="text-center mt-20">{{ error }}</div>
-  </publicWrapper>
+  </PublicWrapper>
 
 </template>
 

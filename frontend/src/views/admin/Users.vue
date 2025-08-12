@@ -6,7 +6,7 @@
   import { useNotificationStore} from '@/stores/notification'
   import { useAlertStore } from '@/stores/alert'
 
-  import adminWrapper from '@/wrappers/adminWrapper.vue'
+  import AdminWrapper from '@/wrappers/AdminWrapper.vue'
   import DeleteIcon from '@/assets/icons/Delete.svg'
   import LoaderIcon from '@/assets/icons/Loader.svg'
 
@@ -69,7 +69,7 @@
 
 <template>
 
-  <adminWrapper>
+  <AdminWrapper>
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest">All Users</h1>
 
@@ -121,6 +121,6 @@
 
     </div>
 
-  </adminWrapper>
+  </AdminWrapper>
 
 </template>

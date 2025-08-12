@@ -11,7 +11,7 @@
 
   import { useFormValidation } from '@/composables/userFormValidation'
 
-  import authWrapper from '@/wrappers/authWrapper.vue';
+  import AuthWrapper from '@/wrappers/AuthWrapper.vue';
 
 
 
@@ -56,7 +56,7 @@
 
 <template>
   <div>
-    <authWrapper>
+    <AuthWrapper>
       <div class="block w-full px-4 pt-4 font-mideum text-teal-600">
         <RouterLink :to="{name: 'home'}">
           <div class=" size-fit px-0.5 animated-underline">
@@ -120,7 +120,7 @@
         </RouterLink>
       </form>
 
-		</authWrapper>
+		</AuthWrapper>
 	</div>
 
 </template>

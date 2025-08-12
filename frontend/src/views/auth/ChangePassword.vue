@@ -8,7 +8,7 @@
   import { useFormValidation } from '@/composables/userFormValidation'
   import { useNotificationStore } from '@/stores/notification';
 
-  import authWrapper from '@/wrappers/authWrapper.vue';
+  import AuthWrapper from '@/wrappers/AuthWrapper.vue';
   import Loader from '@/assets/icons/Loader.svg'
   import Check from '@/assets/icons/Check.svg'
 
@@ -61,12 +61,12 @@
 
 <template>
   <div>
-    <authWrapper>
+    <AuthWrapper>
 
       <h1 class="text-4xl text-center pt-10 pb-4">Change Password</h1>
 
       <form @submit.prevent="onSubmit" class="block w-full px-2 md:px-4 pb-14" novalidate>
-        
+
         <p class="validation-error-text !text-center ">{{ errors.root || '\u00A0' }}</p>
 
         <div class="mb-4">
@@ -132,6 +132,6 @@
       </form>
 
 
-    </authWrapper>
+    </AuthWrapper>
   </div>
 </template>

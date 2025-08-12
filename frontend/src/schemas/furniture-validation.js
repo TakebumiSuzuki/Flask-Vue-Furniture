@@ -18,7 +18,7 @@ export const createFurnitureSchema = z.object({
   // .pipe()を使い、z.coerce.number()で数値型に変換してからバリデーションを行います。
   price: z.coerce
     .number()
-    .nonnegative("価格は0以上の値を指定してください")
+    .nonnegative("Price should be more than 0.")
     .refine(
       (n) => {
         // 文字列に変換してチェックします。
@@ -41,7 +41,7 @@ export const createFurnitureSchema = z.object({
         return true;
       },
       {
-        message: "価格は最大10桁（小数点以下は最大2桁）で入力してください。",
+        message: "Please enter a price with up to 10 digits, including up to 2 decimal places.",
       }
     ),
 

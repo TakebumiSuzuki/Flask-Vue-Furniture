@@ -50,14 +50,6 @@ def create_app(config_override=None) -> Flask:
     app.register_blueprint(account_bp)
     app.register_blueprint(furnitures_bp)
 
-    # --- デバッグ用の情報表示 ---
-    # デバッグモードが有効な場合のみ、URL一覧を表示する
-    if app.config.get("DEBUG"):
-        with app.app_context():
-            print("--- REGISTERED URLS ---")
-            for rule in app.url_map.iter_rules():
-                print(f"Endpoint: {rule.endpoint}, Methods: {rule.methods}, URL: {rule.rule}")
-            print("-----------------------")
 
     return app
 

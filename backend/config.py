@@ -14,8 +14,8 @@ class BaseConfig():
     # 複数の場所を指定することもでき、その場合はリストの順序で優先的に検索されます。
     JWT_TOKEN_LOCATION = ['headers', 'cookies']
 
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=1)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=59)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
 
     # Trueに設定すると、クッキーを利用した際のクロスサイトリクエストフォージェリ（CSRF）保護が有効になります。
     JWT_COOKIE_CSRF_PROTECT = False

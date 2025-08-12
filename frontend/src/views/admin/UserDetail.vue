@@ -1,7 +1,7 @@
 <script setup>
   import { onMounted, ref, computed } from 'vue'
   import apiClient from '@/api'
-  import adminWrapper from '@/wrappers/adminWrapper.vue'
+  import AdminWrapper from '@/wrappers/AdminWrapper.vue'
   import { useLoaderStore } from '@/stores/loader'
   import LoaderIcon from  '@/assets/icons/Loader.svg'
 
@@ -31,7 +31,7 @@
 </script>
 
 <template>
-  <adminWrapper>
+  <AdminWrapper>
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest">User Info</h1>
 
@@ -80,6 +80,6 @@
 
     </div>
 
-  </adminWrapper>
+  </AdminWrapper>
 
 </template>

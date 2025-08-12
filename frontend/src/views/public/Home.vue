@@ -10,7 +10,7 @@
   import Pagination from '@/components/Pagination.vue'
   import FurnitureCard from '@/components/FurnitureCard.vue'
   import Loader from '@/assets/icons/Loader.svg'
-  import publicWrapper from '@/wrappers/publicWrapper.vue'
+  import PublicWrapper from '@/wrappers/PublicWrapper.vue'
 
   // ここで onMounted が先に登録され、このコンポーネントの onMounted よりも先に実行される。
   const { addTarget, startObservation, prepareForUpdate } = useIntersectionObserver({ delayInterval: 100 })
@@ -113,7 +113,6 @@ async function fetchData(){
     order: sortOrder.value,
     page: paginationInfo.currentPage
   }
-
   const response = await apiClient.get(`/api/v1/furnitures`, {
     params: params,
     signal: getNewSignal() // これはサーバーには送られず、内部的に使うだけ
@@ -127,7 +126,7 @@ async function fetchData(){
 
 
 <template>
-  <publicWrapper>
+  <PublicWrapper>
 
     <div class="mb-4 md:mb-6 flex justify-between items-center gap-3 md:gap-6 px-1">
       <input type="search" v-model="query" class="!w-[40%] grow !border-neutral-500">
@@ -183,7 +182,7 @@ async function fetchData(){
       {{ errors }}
     </div>
 
-  </publicWrapper>
+  </PublicWrapper>
 
 
 </template>

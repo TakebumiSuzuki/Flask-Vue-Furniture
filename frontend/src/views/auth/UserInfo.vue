@@ -5,7 +5,7 @@
   import { useAlertStore } from '@/stores/alert'
   import { useNotificationStore } from '@/stores/notification';
 
-  import authWrapper from '@/wrappers/authWrapper.vue';
+  import AuthWrapper from '@/wrappers/AuthWrapper.vue';
 
   import UserIcon from '@/assets/icons/UserIcon.svg'
   import EmailIcon from '@/assets/icons/EmailIcon.svg'
@@ -52,7 +52,7 @@
 
 <template>
   <div>
-    <authWrapper>
+    <AuthWrapper>
 
       <h1 class="text-4xl text-center pt-10 pb-8">User Info</h1>
 
@@ -110,7 +110,7 @@
 
 
 
-    </authWrapper>
+    </AuthWrapper>
   </div>
 
 </template>

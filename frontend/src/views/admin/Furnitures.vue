@@ -10,7 +10,7 @@
   import LoaderIcon from '@/assets/icons/Loader.svg'
 
   import Pagination from '@/components/Pagination.vue'
-  import adminWrapper from '@/wrappers/adminWrapper.vue'
+  import AdminWrapper from '@/wrappers/AdminWrapper.vue'
 
   const loader = useLoaderStore()
   const { getNewSignal } = useAbortController()
@@ -106,7 +106,7 @@
 </script>
 
 <template>
-  <adminWrapper>
+  <AdminWrapper>
     <div class="px-2 md:px-4 md:border-l min-h-180 border-neutral-500">
       <h1 class="text-center text-4xl tracking-widest mb-8">Furnitures</h1>
 
@@ -254,6 +254,6 @@
 
 
 
-  </adminWrapper>
+  </AdminWrapper>
 
 </template>

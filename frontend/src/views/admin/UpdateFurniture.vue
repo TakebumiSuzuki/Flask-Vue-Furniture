@@ -14,7 +14,7 @@
   import Check from '@/assets/icons/Check.svg'
   import Loader from '@/assets/icons/Loader.svg'
 
-  import AdminWrapper from '@/wrappers/adminWrapper.vue'
+  import AdminWrapper from '@/wrappers/AdminWrapper.vue'
 
   import { formatDate } from '@/utilities'
 
