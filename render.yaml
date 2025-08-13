@@ -1,42 +1,46 @@
-# render.yaml (修正版)
+# render.yaml (最終修正版)
 
-# 最初にデータベースを定義するトップレベルのセクション
-databases:
-  - name: furniture-db
-    plan: free
-    postgresMajorVersion: 14
-
-# 次にサービス（Webアプリ、静的サイト）を定義するトップレベルのセクション
+# servicesは、アプリケーションや静的サイトを定義するリストです。
+# 全体を services: で囲み、その中に各サービスを - で列挙します。
 services:
-  # 1. Flask バックエンド (Web Service)
-  - type: web
-    name: furniture-api
-    plan: free
-    rootDir: ./backend
-    startCommand: "gunicorn --bind 0.0.0.0:5000 app:app"
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.1
-      - key: DATABASE_URL
-        fromDatabase: # ★★★ "fromService" ではなく "fromDatabase" を使います
-          name: furniture-db # 上で定義したデータベース名を指定
-          property: connectionString
-      - key: FRONTEND_URL
-        fromService:
-          type: static
-          name: furniture-web
-          property: url
 
-  # 2. Vue3 フロントエンド (Static Site)
-  - type: static
+  # 1. Vue3 フロントエンド (Static Site)
+  # タイプは 'static_site' です。
+  - type: static_site
     name: furniture-web
     plan: free
     rootDir: ./frontend
     buildCommand: "npm install && npm run build"
-    publishPath: "./dist"
+    publishPath: "./dist" # Vueのビルド成果物が出力されるディレクトリ
+    # このサービスには他のサービスに渡す環境変数がないため、envVarsは不要です。
+
+  # 2. Flask バックエンド (Web Service)
+  # フロントエンドの次にバックエンドを定義します。
+  - type: web
+    name: furniture-api
+    plan: free
+    rootDir: ./backend
+    # gunicornを起動するコマンド。DockerfileのCMDをこれで上書きします。
+    startCommand: "gunicorn --bind 0.0.0.0:10000 app:app"
     envVars:
-      - key: VITE_APP_API_URL
+      - key: PYTHON_VERSION
+        value: 3.12.1
+      - key: DATABASE_URL
         fromService:
-          type: web
-          name: furniture-api
+          type: psql # ★★★ DBのタイプは 'psql' を指定します
+          name: furniture-db # 下で定義するDBサービスの名前
+          property: connectionString
+      - key: FRONTEND_URL
+        fromService:
+          type: static_site
+          name: furniture-web
           property: url
+
+  # 3. PostgreSQL データベース
+  # データベースもサービスの一種として 'services' リスト内に定義します。
+  - type: psql
+    name: furniture-db
+    plan: free
+    postgresMajorVersion: 14
+    # Docker Composeのhealthcheckのように、APIが起動する前に
+    # DBが準備完了になるよう、Renderが依存関係を自動で管理します。
