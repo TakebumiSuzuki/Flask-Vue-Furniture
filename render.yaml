@@ -1,43 +1,42 @@
-# render.yml
+# render.yaml (修正版)
 
+# 最初にデータベースを定義するトップレベルのセクション
+databases:
+  - name: furniture-db
+    plan: free
+    postgresMajorVersion: 14
+
+# 次にサービス（Webアプリ、静的サイト）を定義するトップレベルのセクション
 services:
-  # 1. PostgreSQL データベース (docker-composeの 'db' サービスに相当)
-  - type: postgres
-    name: furniture-db
-    plan: free # 無料プラン
-    postgresMajorVersion: 14 # Renderの無料プランで利用可能な安定バージョン (17はまだかも)
-
-  # 2. Flask バックエンド (docker-composeの 'backend' サービスに相当)
+  # 1. Flask バックエンド (Web Service)
   - type: web
     name: furniture-api
-    plan: free # 無料プラン
-    rootDir: ./backend # バックエンドのコードとDockerfileがあるディレクトリ
-    # Renderは上記ディレクトリのDockerfileを自動で検知してビルドします
-    startCommand: "gunicorn --bind 0.0.0.0:5000 app:app" # DockerfileのCMDをこれで上書きして起動
+    plan: free
+    rootDir: ./backend
+    startCommand: "gunicorn --bind 0.0.0.0:5000 app:app"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.1 # Dockerfileのバージョンと合わせるのが望ましい
+        value: 3.12.1
       - key: DATABASE_URL
-        fromService:
-          type: psql
-          name: furniture-db
-          property: connectionString # DBサービスから接続URLを自動で取得
-      - key: FRONTEND_URL # CORS設定用にフロントエンドのURLを渡す
+        fromDatabase: # ★★★ "fromService" ではなく "fromDatabase" を使います
+          name: furniture-db # 上で定義したデータベース名を指定
+          property: connectionString
+      - key: FRONTEND_URL
         fromService:
           type: static
           name: furniture-web
           property: url
 
-  # 3. Vue3 フロントエンド (docker-composeの 'frontend' サービスに相当)
+  # 2. Vue3 フロントエンド (Static Site)
   - type: static
     name: furniture-web
-    plan: free # 無料プラン
-    rootDir: ./frontend # フロントエンドのコードがあるディレクトリ
+    plan: free
+    rootDir: ./frontend
     buildCommand: "npm install && npm run build"
-    publishPath: "./dist" # Vueのビルド成果物が出力されるディレクトリ
+    publishPath: "./dist"
     envVars:
-      - key: VITE_APP_API_URL # Vueアプリが参照するバックエンドAPIのURL
+      - key: VITE_APP_API_URL
         fromService:
           type: web
           name: furniture-api
-          property: url # APIサービスのURLを自動で取得
+          property: url
