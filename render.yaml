@@ -2,7 +2,7 @@
 
 services:
   # 1. PostgreSQL データベース (docker-composeの 'db' サービスに相当)
-  - type: psql
+  - type: postgres
     name: furniture-db
     plan: free # 無料プラン
     postgresMajorVersion: 14 # Renderの無料プランで利用可能な安定バージョン (17はまだかも)
