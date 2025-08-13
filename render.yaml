@@ -1,40 +1,26 @@
 # render.yaml
 databases:
   - name: furniture-db
-    plan: free
-    # databaseName や user を省略すると Render が生成します
-    # 必要なら下記のように明示可能
-    # databaseName: mydatabase
-    # user: postgres
+    # plan やサイズは必要に応じて
+    # plan: free
 
 services:
   # ===== Backend (Flask) =====
   - type: web
     name: furniture-backend
-    env: docker
+    runtime: docker
     rootDir: backend
     dockerfilePath: ./backend/Dockerfile
     autoDeploy: true
-
-    # Flask 側では必ず 0.0.0.0:$PORT でリッスンするようにしてください
-    # (例) gunicorn -b 0.0.0.0:$PORT "app:create_app()"
-    # startCommand を Dockerfile 側で定義しているならここは不要です
-    # startCommand: ""
+    # Flask は 0.0.0.0:$PORT で listen すること（Dockerfile/起動コマンド側で設定）
 
     envVars:
-      # マネージド Postgres の接続文字列（外部接続）
+      # Render Postgres の外部接続文字列を注入
       - key: DATABASE_URL
         fromDatabase:
           name: furniture-db
           property: connectionString
-
-      # 内部ネットワーク用の接続文字列（推奨）
-      - key: INTERNAL_DATABASE_URL
-        fromDatabase:
-          name: furniture-db
-          property: internalConnectionString
-
-      # 必要に応じて追加の環境変数をここに並べてください
+      # 必要に応じて追加
       # - key: FLASK_ENV
       #   value: production
       # - key: SECRET_KEY
@@ -43,7 +29,7 @@ services:
   # ===== Frontend (Vue 3 / Vite を Static Site として配信) =====
   - type: web
     name: furniture-frontend
-    env: static
+    runtime: static
     rootDir: frontend
     buildCommand: |
       npm ci
@@ -51,19 +37,14 @@ services:
     staticPublishPath: dist
     autoDeploy: true
 
-    # SPA のためのリライト（必要に応じて有効化）
+    # SPA のための 404 回避（必要なければ削除）
     routes:
-      - type: rewrite
-        source: /api/*
-        destination: https://furniture-backend.onrender.com/api/*
       - type: rewrite
         source: /*
         destination: /index.html
 
     envVars:
-      # フロントのビルド時にバックエンドの URL を埋め込み（Vite の環境変数）
+      # フロントで API ベース URL を使う場合は、手動で設定してください
+      # （Static Site から他サービスの「URL」は参照できないため）
       - key: VITE_API_BASE
-        fromService:
-          name: furniture-backend
-          type: web
-          property: url
+        sync: false   # 初回デプロイ時にダッシュボードで入力（例: https://<backend>.onrender.com）
