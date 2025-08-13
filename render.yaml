@@ -1,38 +1,69 @@
-# databases と services は、トップレベルで定義される別々のセクションです。
-
+# render.yaml
 databases:
-  # PostgreSQLデータベースの定義
   - name: furniture-db
     plan: free
+    # databaseName や user を省略すると Render が生成します
+    # 必要なら下記のように明示可能
+    # databaseName: mydatabase
+    # user: postgres
 
-# Webサービスや静的サイトの定義
 services:
-  # 1. Vue3 フロントエンド (静的サイトとして定義)
-  #    静的サイトは「type: web」と「runtime: static」を組み合わせます。
+  # ===== Backend (Flask) =====
   - type: web
-    name: furniture-web
-    plan: free
-    runtime: static # これで静的サイトとして扱われます
-    rootDir: ./frontend
-    buildCommand: "npm install && npm run build"
-    publishPath: "dist" # ビルド成果物が出力されるディレクトリ
-    # autoDeployはデフォルトでtrueなので、必要に応じてfalseに設定できます
+    name: furniture-backend
+    env: docker
+    rootDir: backend
+    dockerfilePath: ./backend/Dockerfile
+    autoDeploy: true
 
-  # 2. Flask バックエンド (Web Service)
-  - type: web
-    name: furniture-api
-    plan: free
-    runtime: docker # Dockerfileを使うことを明示します
-    rootDir: ./backend
-    # DockerfileのCMDをGunicornで上書きして起動します
-    startCommand: "gunicorn --bind 0.0.0.0:10000 app:app"
+    # Flask 側では必ず 0.0.0.0:$PORT でリッスンするようにしてください
+    # (例) gunicorn -b 0.0.0.0:$PORT "app:create_app()"
+    # startCommand を Dockerfile 側で定義しているならここは不要です
+    # startCommand: ""
+
     envVars:
+      # マネージド Postgres の接続文字列（外部接続）
       - key: DATABASE_URL
         fromDatabase:
-          name: furniture-db # 上で定義したデータベース名
+          name: furniture-db
           property: connectionString
-      - key: FRONTEND_URL
+
+      # 内部ネットワーク用の接続文字列（推奨）
+      - key: INTERNAL_DATABASE_URL
+        fromDatabase:
+          name: furniture-db
+          property: internalConnectionString
+
+      # 必要に応じて追加の環境変数をここに並べてください
+      # - key: FLASK_ENV
+      #   value: production
+      # - key: SECRET_KEY
+      #   generateValue: true
+
+  # ===== Frontend (Vue 3 / Vite を Static Site として配信) =====
+  - type: web
+    name: furniture-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: |
+      npm ci
+      npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+
+    # SPA のためのリライト（必要に応じて有効化）
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://furniture-backend.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+    envVars:
+      # フロントのビルド時にバックエンドの URL を埋め込み（Vite の環境変数）
+      - key: VITE_API_BASE
         fromService:
-          type: web # フロントエンドもtype: webです
-          name: furniture-web
+          name: furniture-backend
+          type: web
           property: url
