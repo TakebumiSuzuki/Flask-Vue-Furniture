@@ -1,46 +1,38 @@
-# render.yaml (最終修正版)
+# databases と services は、トップレベルで定義される別々のセクションです。
 
-# servicesは、アプリケーションや静的サイトを定義するリストです。
-# 全体を services: で囲み、その中に各サービスを - で列挙します。
+databases:
+  # PostgreSQLデータベースの定義
+  - name: furniture-db
+    plan: free
+
+# Webサービスや静的サイトの定義
 services:
-
-  # 1. Vue3 フロントエンド (Static Site)
-  # タイプは 'static_site' です。
-  - type: static_site
+  # 1. Vue3 フロントエンド (静的サイトとして定義)
+  #    静的サイトは「type: web」と「runtime: static」を組み合わせます。
+  - type: web
     name: furniture-web
     plan: free
+    runtime: static # これで静的サイトとして扱われます
     rootDir: ./frontend
     buildCommand: "npm install && npm run build"
-    publishPath: "./dist" # Vueのビルド成果物が出力されるディレクトリ
-    # このサービスには他のサービスに渡す環境変数がないため、envVarsは不要です。
+    publishPath: "dist" # ビルド成果物が出力されるディレクトリ
+    # autoDeployはデフォルトでtrueなので、必要に応じてfalseに設定できます
 
   # 2. Flask バックエンド (Web Service)
-  # フロントエンドの次にバックエンドを定義します。
   - type: web
     name: furniture-api
     plan: free
+    runtime: docker # Dockerfileを使うことを明示します
     rootDir: ./backend
-    # gunicornを起動するコマンド。DockerfileのCMDをこれで上書きします。
+    # DockerfileのCMDをGunicornで上書きして起動します
     startCommand: "gunicorn --bind 0.0.0.0:10000 app:app"
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.1
       - key: DATABASE_URL
-        fromService:
-          type: psql # ★★★ DBのタイプは 'psql' を指定します
-          name: furniture-db # 下で定義するDBサービスの名前
+        fromDatabase:
+          name: furniture-db # 上で定義したデータベース名
           property: connectionString
       - key: FRONTEND_URL
         fromService:
-          type: static_site
+          type: web # フロントエンドもtype: webです
           name: furniture-web
           property: url
-
-  # 3. PostgreSQL データベース
-  # データベースもサービスの一種として 'services' リスト内に定義します。
-  - type: psql
-    name: furniture-db
-    plan: free
-    postgresMajorVersion: 14
-    # Docker Composeのhealthcheckのように、APIが起動する前に
-    # DBが準備完了になるよう、Renderが依存関係を自動で管理します。
