@@ -5,6 +5,29 @@ const refreshTokenApiClientOnReload = axios.create({
     withCredentials: true
 });
 
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+refreshTokenApiClientOnReload.interceptors.request.use(
+  (config) => {
+    const csrfToken = getCookie('csrf_refresh_token');
+    if (csrfToken) {
+      config.headers['X-CSRF-TOKEN'] = csrfToken;
+    }
+    // POST, PUT, DELETEなどのリクエストに対してCSRFトークンをヘッダーに付与
+    if (['GET','POST', 'PUT', 'DELETE'].includes(config.method.toUpperCase())) {
+      const csrfToken = getCookie('csrf_refresh_token');
+      if (csrfToken) {
+        config.headers['X-CSRF-TOKEN'] = csrfToken;
+      }
+    }
+    return config
+  }
+)
+
 export const useAuthStore = defineStore('auth', ()=>{
 
   const accessToken = ref(null)
@@ -152,12 +175,12 @@ export const useAuthStore = defineStore('auth', ()=>{
         const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens', {}, {
           withCredentials: true
         })
-        console.log('リロードによるトークンゲットに成功しました')
+        console.log('リロードによるトークン取得成功')
         accessToken.value = response.data.access_token
         user.value = response.data.user
 
       }catch(err){
-        console.log('リロードによるトークンゲットに失敗しました。')
+        console.log('リロードによるトークン取得失敗')
         accessToken.value = null
         user.value = null
       }
@@ -183,7 +206,8 @@ export const useAuthStore = defineStore('auth', ()=>{
     refreshOnReload,
   }
 
-},{
-    persist: true, // ここで永続化を有効にする
-  }
+},
+// {
+//   persist: true, // ここで永続化を有効にする
+// }
 )

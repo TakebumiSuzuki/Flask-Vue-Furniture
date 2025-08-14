@@ -143,23 +143,28 @@ const router = createRouter({
 })
 
 router.beforeEach(async(to)=>{
-  const notificationStore = useNotificationStore();
 
+  const notificationStore = useNotificationStore();
   const authStore = useAuthStore()
+
   // 認証初期化がまだなら、完了するのを待つ
   if (!authStore.isInitialRefreshDone) {
     // 除外ルートでなければリフレッシュ処理を試みる
     const exclusionRoutes = ['login', 'register', 'unauthorized'];
     if (!exclusionRoutes.includes(to.name)) {
       await authStore.refreshOnReload();
-  } else {
+  }else{
     // 除外ルートの場合は何もしないが、初期化完了フラグは立てる
     authStore.isInitialRefreshDone = true;
     }
   }
+
+  // ログインが必要だがログインしていない場合
   if (to.meta.requiresAuth && !authStore.isAuthenticated){
     notificationStore.pendingNotification = { msg:'Please log in to see this page.' ,msgType: 'info' }
     return { name: 'login' }
+
+  // アドミンロールが必要だが、アドミンでない場合
   }else if (to.meta.requiresAdmin && !authStore.isAdmin){
     return { name: 'unauthorized'}
   }

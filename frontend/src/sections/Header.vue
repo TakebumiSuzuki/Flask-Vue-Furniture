@@ -3,6 +3,7 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/auth'
   import { useNotificationStore} from '@/stores/notification'
+  import { useAlertStore } from '@/stores/alert'
   import Logo from '@/assets/images/logo.svg'
   import UserIcon from '@/assets/icons/UserIcon.svg'
   import HomeIcon from '@/assets/icons/Home.svg'
@@ -16,6 +17,7 @@
 
   const authStore = useAuthStore()
   const notificationStore = useNotificationStore()
+  const alertStore = useAlertStore()
   const router = useRouter()
   const showSidePane = ref(false)
 
@@ -26,13 +28,27 @@
 
   const handleLogout = async()=>{
     try{
+      const result = await alertStore.showAlert(
+        'Are you sure you want to log out?',
+        [{ text: 'Yes', value: true, style: 'primary' }, { text: 'Cancel', value: false, style: 'secondary' }]
+      )
+      console.log(result)
+      if (result){
+        logOut()
+      }
+    }catch(err){
+      console.error(err)
+    }
+  }
+
+  const logOut = async()=>{
+    try{
       await authStore.logout()
       router.push({name: 'home'})
       notificationStore.showNotification('You have logged out.', 'success');
     }catch(err){
       console.log(err)
       notificationStore.showNotification('Failed to logout try it later again.', 'error')
-
     }
   }
 

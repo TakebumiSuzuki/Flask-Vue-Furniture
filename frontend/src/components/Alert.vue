@@ -7,7 +7,7 @@
   const getButtonClasses = (style) => {
     switch (style) {
       case 'primary':
-          return 'bg-blue-500 text-neutral-50 hover:bg-blue-600';
+          return 'bg-teal-500 text-neutral-50 hover:bg-teal-600';
       case 'danger':
           return 'bg-red-500 text-neutral-50 hover:bg-red-600';
       case 'secondary':

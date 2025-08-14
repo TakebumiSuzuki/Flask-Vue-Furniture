@@ -23,9 +23,6 @@
       <p class="truncate">{{ furniture.name }}</p>
     </div>
 
-
-
-
   </div>
 
 

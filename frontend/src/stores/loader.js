@@ -11,7 +11,6 @@ export const useLoaderStore = defineStore('loader', ()=>{
     const increaseCount = () => {
         console.log('loader increase called')
         loadingCount.value ++
-        console.log(`ローディング中かどうか: ${loading.value}`)
     }
 
     const decreaseCount = () => {
