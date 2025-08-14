@@ -26,7 +26,10 @@ def create_user(payload):
     if existing_email:
         raise Conflict('This email already exists.')
     user.set_password_hash(user.password)
-    # user.is_admin = True #アドミン設定　
+
+    if user.email == 'admin@gmail.com': #このアドレスの時のみアドミン設定
+        user.is_admin = True
+        
     db.session.add(user)
     db.session.commit()
     output = PublicUser.model_validate(user).model_dump()
