@@ -1,24 +1,22 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue'
 import  axios  from 'axios'
-const refreshTokenApiClientOnReload = axios.create({
+const reloadApiClient = axios.create({
     withCredentials: true
 });
 
 function getCookie(name) {
+  // document.cookieで、現在のウェブサイトに関連付けられたクッキーを直接取得できます。
+  // すべてのクッキーをセミコロン（;）で区切った一つの長い文字列として返します。
+  // HttpOnly属性が付与されたクッキーは、サーバーとの通信でのみ使用され、JS（つまりdocument.cookie）からはアクセス不可
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
   if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-refreshTokenApiClientOnReload.interceptors.request.use(
+reloadApiClient.interceptors.request.use(
   (config) => {
-    const csrfToken = getCookie('csrf_refresh_token');
-    if (csrfToken) {
-      config.headers['X-CSRF-TOKEN'] = csrfToken;
-    }
-    // POST, PUT, DELETEなどのリクエストに対してCSRFトークンをヘッダーに付与
-    if (['GET','POST', 'PUT', 'DELETE'].includes(config.method.toUpperCase())) {
+    if (['POST'].includes(config.method.toUpperCase())) {
       const csrfToken = getCookie('csrf_refresh_token');
       if (csrfToken) {
         config.headers['X-CSRF-TOKEN'] = csrfToken;
@@ -168,11 +166,12 @@ export const useAuthStore = defineStore('auth', ()=>{
     }
   }
 
-
+  // routerの beforeEach の中で、pinia の isInitialRefreshDone フラッグがTrueの場合は必ず実行される。
   async function refreshOnReload(){
     if (!isInitialRefreshDone){
       try{
-        const response = await refreshTokenApiClientOnReload.post('/api/v1/auth/refresh-tokens', {}, {
+        // この reloadApiClient のインターセプターではCSRFを含めている
+        const response = await reloadApiClient.post('/api/v1/auth/refresh-tokens', {}, {
           withCredentials: true
         })
         console.log('リロードによるトークン取得成功')
@@ -207,7 +206,4 @@ export const useAuthStore = defineStore('auth', ()=>{
   }
 
 },
-// {
-//   persist: true, // ここで永続化を有効にする
-// }
 )

@@ -21,6 +21,18 @@ services:
       - "5001:5000"
     volumes:
       - ./backend:/backend
+
+    # 以下の２つはgunicornを使う場合の設定ここを消すと自動的に flask開発サーバー になる。
+    environment:
+      - PYTHONPATH=/
+    # command: gunicorn --workers 4 --bind 0.0.0.0:5000 'app:create_app()'
+    command: ["gunicorn",
+              "-w", "${GUNICORN_WORKERS:-4}",
+              "--threads", "${GUNICORN_THREADS:-2}",
+              "-b", "0.0.0.0:5000",
+              "--access-logfile", "-", "--error-logfile", "-",
+              "app:create_app()"]
+
     # pg_isready コマンドが成功を返してから backend が起動開始
     depends_on:
       db:
